@@ -96,3 +96,6 @@ The following is an outline for how the data and code fit together:
 
 - Blue "Figure" components are figures generated for the manuscript
 - Scripts beginning with "0" are run prior to exporting the Shock file and running the simulation in SIMPLE-G
+
+
+![Alt Text: Flow Diagram for Telecoupling & SIMPLE-G Project](../Figures/_FlowDiagram.png)
