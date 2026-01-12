@@ -32,6 +32,7 @@ library(geobr) # loading Cerrado & BR shapefiles
 library(terra) # raster loading/manipulation and plotting
 library(sidrar) # getting data from SIDRA
 library(RColorBrewer) # adding color palettes to maps 
+library(dplyr) # pipes
 
 # data import & export  
 path_import <- "../Data_Source/"
