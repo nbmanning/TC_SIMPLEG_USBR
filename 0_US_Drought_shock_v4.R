@@ -1,5 +1,5 @@
 # 00) Script Information -----------------------
-# Title: 0_US_Drought_shock_v4.R
+# Title: 0_US_Drought_shock.R
 
 # Purpose: This script calculates the US 2012 crop shock for use in SIMPLE-G-Global
 
@@ -17,18 +17,17 @@
 ### AGLAND_CROP_INSURANCE_ACRES_FIPS.csv
 ### CROP_TOTALS_SALES_USD_FIPS.csv
 ### cb_2018_us_state_500k.shp
-
-## 'grid_id_xyg.tif' which is a file typically used in SIMPLE-G with the grid cell ID numbers for eachgrid cell around the world
+### 'grid_id_xyg.tif' which is a file typically used in SIMPLE-G with the grid cell ID numbers for eachgrid cell around the world
 
 
 # OUTPUTS:
-## 'shock_v4_df.RData' which contains:
+## 'shock_df.RData' which contains:
 ### df.xyz = the XY loss rates that get converted to raster
 ### loss.aggr = the variable we're going to change by filtering only to drought and heat   
 
-## 'shock_v4_r99.RData' which contains raster 'r' which is the Loss Rate 
+## 'shock_r99.RData' which contains raster 'r' which is the Loss Rate 
 ## 'y12d.txt' & 'y12d.har' which are the files that are input into SIMPLE-G
-## 'Figures/SIMPLEG_Shock_v4.png' which is the map of the percent loss of corn+soy from drought and heat
+## 'Figures/Figure_ShockMap2012.png' which is the map of the percent loss of corn+soy from drought and heat
 
 
 # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # 
@@ -48,7 +47,7 @@ library(ggplot2)
 
 # 1) Create a data frame with FIPS and XY coordinates and SIMPLE-G grid IDs ----
 # US coordinates and FIPS
-us.xy.file = "../US_Drought_Shock_v4/Coords.csv" #NOTE: re-name folder to "../US_Drought_Shock_v4" after moving this code to the "Code" folder 
+us.xy.file = "../US_Drought_Shock/Coords.csv" #NOTE: re-name folder to "../US_Drought_Shock" after moving this code to the "Code" folder 
 tmp = read.csv(us.xy.file, header=T, sep=",")
 
 # re-generate coordinates to ensure decimal accuracy
@@ -64,11 +63,11 @@ us.xy = tmp[c("x","y","FIPS", "VCRP_2010", "QLND_2010")]
 # 2) Create a data frame of loss by FIPS for 2012 ----
 
 # read the USDA RMA Causes of Loss
-loss.file = "../US_Drought_Shock_v4/colsom_2012/colsom12.txt" #NOTE: needed to re-name folder here
+loss.file = "../US_Drought_Shock/colsom_2012/colsom12.txt" #NOTE: needed to re-name folder here
 loss.dt = read.csv(loss.file, header =F, sep="|")
 
 #read the column labels
-loss.id = "../US_Drought_Shock_v4/Codes.csv"
+loss.id = "../US_Drought_Shock/Codes.csv"
 id = read.csv(loss.id, header =F, sep=",")
 
 names(loss.dt) = id$V1
@@ -101,7 +100,7 @@ summary(loss.aggr)
 # 3) Create a data frame of insured acres ----
 
 ## 3.1) read the insured acres from USDA-NASS Census of AG ----
-my.file = "../US_Drought_Shock_v4/AGLAND_CROP_INSURANCE_ACRES_FIPS.csv" 
+my.file = "../US_Drought_Shock/AGLAND_CROP_INSURANCE_ACRES_FIPS.csv" 
 my.dt = read.csv(my.file, header =T, sep=",")
 my.df <- my.dt %>% mutate_all(as.numeric)
 summary(my.df)
@@ -112,7 +111,7 @@ head(insured.acres)
 
 
 ## 3.2) read the cropland acres from USDA-NASS Census of AG ----
-my.file = "../US_Drought_Shock_v4/AGLAND_CROPLAND_ACRES.csv"
+my.file = "../US_Drought_Shock/AGLAND_CROPLAND_ACRES.csv"
 my.dt = read.csv(my.file, header =T, sep=",")
 my.df <- my.dt %>% mutate_all(as.numeric)
 summary(my.df)
@@ -122,7 +121,7 @@ names(crop.acres) = c("FIPS", "Crop.Acres")
 head(crop.acres)
 
 ## 3.3) read the crop sales from USDA-NASS Census of AG ----
-my.file = "../US_Drought_Shock_v4/CROP_TOTALS_SALES_USD_FIPS.csv"
+my.file = "../US_Drought_Shock/CROP_TOTALS_SALES_USD_FIPS.csv"
 my.dt = read.csv(my.file, header =T, sep=",")
 my.df <- my.dt %>% mutate_all(as.numeric)
 summary(my.df)
@@ -191,11 +190,11 @@ paste0("We found an average shock of ", format(round(ms_shock_mean, 2), nsmall =
 ## df.xyz = the XY loss rates that get converted to raster; don't need fips.df bc fips.df feeds into this
 ## loss.aggr = the variable we're going to change by filtering only to drought and heat   
 save(df.xyz, loss.aggr,
-     file = "../Data_Derived/shock_v4_df.RData")
+     file = "../Data_Derived/shock_df.RData")
 
 # save raster
 ## r = Loss Rate 
-save(r, file = "../Data_Derived/shock_v4_r99.RData")
+save(r, file = "../Data_Derived/shock_r99.RData")
 
 
 # 5) Plot the shock ----
@@ -205,7 +204,7 @@ u = terra::project(r, "+init=epsg:2163")
 #u = terra::project(r, "+init=epsg:4326")
 
 
-v = vect("../US_Drought_Shock_v4/cb_2018_us_state_500k/cb_2018_us_state_500k.shp") #NOTE: Need to copy/paste the US shp folder to v2
+v = vect("../US_Drought_Shock/cb_2018_us_state_500k/cb_2018_us_state_500k.shp") #NOTE: Need to copy/paste the US shp folder to v2
 
 v = crop(v,s)
 
@@ -238,11 +237,11 @@ ggplot()+
   guides(fill = guide_legend(direction = "horizontal"))
 
 # save
-ggsave("../Figures/SIMPLEG_Shock_v4.png",
+ggsave("../Figures/Figure_ShockMap2012.png",
        height = 10, width = 15, dpi = 300)
 
 # 6) Shock for SIMPLE-G global  ----
-xygID  <- rast("../US_Drought_Shock_v4/grid_id_xyg.tif")
+xygID  <- rast("../US_Drought_Shock/grid_id_xyg.tif")
 plot(xygID)
 
 nGrid = 1316744
@@ -268,10 +267,9 @@ v = "y12d"
 print(v)
 txt <- paste0(nGrid, ' real row_order header "',v,'" longname "US 2012 Drought Shock, revision d" ;')
 
-# txt.file = paste0("../US_Drought_Shock_v4/", v,".txt") # NOTE: this works to get the .txt file to the right folder but does not convert to HAR
 txt.file = paste0(v,".txt")
 
-write(txt, txt.file) # NOTE: Need to manually move y12d from the working directory (for me, "Code") to US_Drought_Shock_v4
+write(txt, txt.file) # NOTE: May need to manually move y12d from the working directory (for me, "Code") to US_Drought_Shock
 
 my.var = "LossRate"
 
