@@ -111,20 +111,12 @@ df <- gather(df,"year","ha",9:ncol(df))
 
 
 
-## 1.3) Save / Load -----
-# save(df_clean, file = paste0(folder_derived, "mapb_col8_clean.Rdata"))
+## 1.3) Save df -----
 save(df, file = paste0(folder_derived, "mapb_col8_clean_long.Rdata"))
 
 # NOTE: THIS INCLUDES ALL 
 
-# Load 
-# load(file = paste0(folder_derived, "mapb_col8_clean.Rdata"))
-# load(file = paste0(folder_derived, "mapb_col8_clean_long.Rdata"))
-
-
-# 2) Transition Results: Doesn't Change with new Model Runs -----
-
-# NOTE: It is useful to clear the environment and re-run Sections 0 and 2 before running this section
+# 2) Plot Transition Results -----
 
 # set relevant vegetation class categories
 list_from_lv3 <- c("Forest Formation", "Savanna Formation", "Wetland",
@@ -133,10 +125,6 @@ list_from_lv3 <- c("Forest Formation", "Savanna Formation", "Wetland",
                    "Magrove", "Flooded Forest",
                    "Shrub Restinga", "Other Non Forest Natural Formation", "Wooded Restinga",
                    "Perennial Crops")
-
-# load clean and long MapBiomas Collection 8 data
-#  NOTE: for steps on cleaning, see aggStats_MapBiomas.R Section 1
-load(file = paste0(folder_derived, "mapb_col8_clean_long.Rdata"))
 
 # filter Mapbiomas data to only focus on transitions to "Soybeans" & From-To's that do not stay the same
 df <- df %>%
