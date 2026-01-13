@@ -116,10 +116,9 @@ spam_maize_prod <- rast(paste0(path_import, "SPAM2010/spam2010V2r0_global_P_MAIZ
 
 # join all together to one variable
 spam <- c(spam_soy_parea, spam_maize_parea, spam_soy_prod, spam_maize_prod)
-terra::plot(spam)
 
 spam_harv_prod <- c(spam_soy_harvarea, spam_maize_harvarea, spam_soy_prod, spam_maize_prod)
-terra::plot(spam_harv_prod)
+
 
 ## 2.1) Clip to Brazil to test ----
 
@@ -134,26 +133,20 @@ ext_br <- vect(ext(shp_br))
 # plot basic BR results by cropping and masking to just BR extent
 r_br <- terra::crop(spam, ext_br, mask = T) 
 r_br <- mask(r_br, shp_br)
-terra::plot(r_br, axes = F, type = "interval")
+
 r_br_source <- r_br 
 
 ## 2.2) Get results --------------
 ## Note: area = (total area)/(ha)
-plot(r_br$spam2010V2r0_global_A_SOYB_A)
-plot(spam_soy_parea)
-
 
 ### 2.2.1A) Area (% of grid cell) ------ 
 # get area of each grid cell (will be different bc of projection)
 r_br_area <- cellSize(r_br$spam2010V2r0_global_A_SOYB_A, unit = "ha")
-plot(r_br_area)
 
 # get harvested percentages by dividing by area of each grid cell 
 spam_soy_parea_perc <- (r_br$spam2010V2r0_global_A_SOYB_A/r_br_area) #* 100
-plot(spam_soy_parea_perc)
-
 spam_maize_parea_perc <- (r_br$spam2010V2r0_global_A_MAIZ_A/r_br_area) #* 100
-plot(spam_maize_parea_perc)
+
 
 ### 2.2.1B) Area (% of total) -----
 # get the sum of the total crop (either so or maize) produced across BR; should be one value 
@@ -165,10 +158,8 @@ sum_parea_maize <- as.numeric(
 
 # divide rasters by total sum for each crop to get the percent of the total per each grid cell
 spam_soy_parea_perctotal <- r_br$spam2010V2r0_global_A_SOYB_A / sum_parea_soy
-plot(spam_soy_parea_perctotal)
-
 spam_maize_parea_perctotal <- r_br$spam2010V2r0_global_A_MAIZ_A / sum_parea_maize
-plot(spam_soy_parea_perctotal)
+
 
 ### 2.2.2) Production (% of total) ------
 # get production percentage (% of total per grid cell)
@@ -186,25 +177,19 @@ sum_prod_maize <- as.numeric(
 
 # divide rasters by total sum for each crop
 spam_soy_prod_perc <- r_br$spam2010V2r0_global_P_SOYB_A / sum_prod_soy
-plot(spam_soy_prod_perc)
-
 spam_maize_prod_perc <- r_br$spam2010V2r0_global_P_MAIZ_A / sum_prod_maize
-plot(spam_maize_prod_perc)
 
 
 ### 2.2.3) Yield per grid cell (production / harvested area) (mt / ha) ------
 spam_soy_yield <- r_br$spam2010V2r0_global_P_SOYB_A / r_br$spam2010V2r0_global_A_SOYB_A
 spam_maize_yield <- r_br$spam2010V2r0_global_P_MAIZ_A / r_br$spam2010V2r0_global_A_MAIZ_A
 
-plot(spam_soy_yield)
 
 ## 2.3) Combine to Get Percentage Raster Stack ---------
 # Combine percentage rasters 
 spam_perc <- c(spam_soy_parea_perc, spam_maize_parea_perc, spam_soy_prod_perc, spam_maize_prod_perc)
-plot(spam_perc)
 
 spam_perc_total <- c(spam_soy_parea_perctotal, spam_maize_parea_perctotal, spam_soy_prod_perc, spam_maize_prod_perc)
-plot(spam_perc_total)
 
 spam_perc_all <- c(spam_soy_parea_perc, spam_maize_parea_perc, spam_soy_parea_perctotal, spam_maize_parea_perctotal, spam_soy_prod_perc, spam_maize_prod_perc, spam_soy_yield, spam_maize_yield)
 
@@ -247,22 +232,15 @@ ext_cerr <- vect(ext(shp_br_cerr))
 # crop, mask, and plot 
 r_cerr <- terra::crop(spam_perc_all, ext_cerr, mask = T)
 r_cerr <- mask(r_cerr, shp_br_cerr)
-terra::plot(r_cerr, axes = F, nc = 4, nr = 2)
-
 
 # plot specific w lines
 plot(r_cerr[["soy_yield_gridcell"]], col = brewer.pal(9, "Greens"),
-     main = "2010 Cerrado Soy Yield per Grid Cell",
-     #breaks = c(0, 2, 4, 6, 8, 10)
-     #breaks = c(0, 5, 10, 15, 20, 25)
-)
+     main = "2010 Cerrado Soy Yield per Grid Cell")
 lines(shp_br_cerr, lwd = 0.8, lty = 3, col = "darkgray")
 
 
 plot(r_cerr[["maize_yield_gridcell"]], col = brewer.pal(9, "Greens"),
-     main = "2010 Cerrado Maize Yield per Grid Cell",
-     #breaks = c(0, 5, 10, 15, 20, 25)
-)
+     main = "2010 Cerrado Maize Yield per Grid Cell")
 lines(shp_br_cerr, lwd = 0.8, lty = 3, col = "darkgray")
 
 
