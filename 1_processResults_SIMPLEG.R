@@ -43,15 +43,15 @@ library(rworldmap) # getting simple BR Border
 
 # new code #
 # Define the string to search for in file names
-search_string <- "2024-11-15"
+search_string <- "" #"2024-11-15"
 
 # create vars to house results 
-folder_der <- "../Data_Derived/"
+folder_derived <- "../Data_Derived/"
 folder_fig <- "../Figures/"
-folder_stat <- "../Results/"
+folder_results <- "../Results/"
 
 # List all files and folders in the current directory
-files_der <- list.dirs(folder_der)
+files_der <- list.dirs(folder_derived)
 files_fig <- list.dirs(folder_fig)
 
 # Check if any file name contains the search string
@@ -60,7 +60,7 @@ files_fig <- list.dirs(folder_fig)
 
 if (!(any(grepl(search_string, files_der)))) {
   # If no file name contains the search string, create a folder with that string
-  dir.create(paste0(folder_der, search_string))
+  dir.create(paste0(folder_derived, search_string))
   
   cat("Derived Data Folder", search_string, "created.\n")
 } else {
@@ -83,11 +83,13 @@ datafile_version <- "sg1x3x10_v2411_US_Heat"
 pct <- "_h" # change when you change 'datafile';
 pct_title <- " - High" # for plotting, either " - High" or " - Low" or "" or "- Med"
 
-folder_results <- paste0("../Results/SIMPLEG-", search_string, "/")
+folder_results <- paste0("../Results/SIMPLEG", search_string, "/")
 folder_fig <- paste0(folder_fig, search_string, "/")
 
-folder_der <- paste0(folder_der, search_string, "/")
-folder_stat <- paste0(folder_results, "stat_summary/")
+folder_derived <- paste0(folder_derived, search_string, "/")
+folder_results <- paste0(folder_results#, 
+                         #"stat_summary/"
+                         )
 
 datafile   <- paste0(folder_results, datafile_version, pct, "-out.txt")
 
@@ -197,8 +199,6 @@ writeRaster(prct_ras$new_LND_SOY, paste0(ras_file, "MAZ_new_", pct, ".tif"), for
 writeRaster(prct_ras$LON, paste0(ras_file, "USBR_SIMPLEG_LON.tif"), format="GTiff", overwrite=TRUE)
 writeRaster(prct_ras$LAT, paste0(ras_file, "USBR_SIMPLEG_LAT.tif"), format="GTiff", overwrite=TRUE)
 
-# NOTE: in the future could try below code, from https://stackoverflow.com/questions/68253507/how-to-write-raster-bylayer-using-terra-package-in-r
-# z <- writeRaster(s, paste0(names(s), ".tif"), overwrite=TRUE)
 
 ## Save 'terra' object ------ 
 # create SpatRaster using terra
@@ -212,8 +212,8 @@ r_maizesoy <- subset(r, c("pct_QLAND", "new_QLAND", "pct_QCROP", "new_QCROP",
 r <- subset(r, c("pct_QLAND", "new_QLAND", "pct_QCROP", "new_QCROP"))
 
 # save
-saveRDS(r, file = paste0(folder_der, "r", pct, ".rds"))
-saveRDS(r_maizesoy, file = paste0(folder_der, "r_maizesoy", pct, ".rds"))
+saveRDS(r, file = paste0(folder_derived, "r", pct, ".rds"))
+saveRDS(r_maizesoy, file = paste0(folder_derived, "r_maizesoy", pct, ".rds"))
 
 
 
