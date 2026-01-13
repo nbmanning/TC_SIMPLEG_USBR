@@ -41,7 +41,29 @@ library(rworldmap) # getting simple BR Border
 ## lo: enter "_lo" ;
 ## out / default; enter ""
 
-# new code #
+# # # # # # # # # # # # # # # # # # 
+# UNCOMMENT FOR LOW SCENARIO
+# # # # # # # # # # # # # # # # # # 
+# pct <- "_l" 
+# pct_model <- "l" 
+# pct_title <- " - Low" 
+
+# # # # # # # # # # # # # # # # # # 
+# UNCOMMENT FOR MEDIUM SCENARIO
+# # # # # # # # # # # # # # # # # # 
+# pct <- "_m" 
+# pct_model <- "m" 
+# pct_title <- "" 
+# # pct_title <- " - Med"
+
+# # # # # # # # # # # # # # # # # # 
+# UNCOMMENT FOR HIGH SCENARIO
+# # # # # # # # # # # # # # # # # # 
+# pct <- "_h" 
+# pct_model <- "h" 
+# pct_title <- " - High"
+
+
 # Define the string to search for in file names
 search_string <- "" #"2024-11-15"
 
@@ -80,8 +102,6 @@ if (!(any(grepl(search_string, files_fig)))) {
 
 ### For newer (3/3, 9/15, 11/15/24) runs ###
 datafile_version <- "sg1x3x10_v2411_US_Heat"
-pct <- "_h" # change when you change 'datafile';
-pct_title <- " - High" # for plotting, either " - High" or " - Low" or "" or "- Med"
 
 folder_results <- paste0("../Results/SIMPLEG", search_string, "/")
 folder_fig <- paste0(folder_fig, search_string, "/")
