@@ -61,11 +61,28 @@ library(dplyr)
 
 # Set model version & parameter flexibility
 datafile_version <- "sg1x3x10_v2411_US_Heat"
-pct <- "_h" # change when you change 'datafile'
-pct_model <- "h" # for the imp/exp cleaning, either l, m, h
 
-pct_title <- "- High" # for plotting, either " - High" or " - Low" or "" or "- Med"
-#pct_title <- " - High" # note: changed Aug 2024 by setting -med to nothing, as it is the default
+# # # # # # # # # # # # # # # # # # # 
+# # UNCOMMENT FOR LOW SCENARIO
+# # # # # # # # # # # # # # # # # # # 
+# pct <- "_l" 
+# pct_model <- "l" 
+# pct_title <- " - Low" 
+# 
+# # # # # # # # # # # # # # # # # # # 
+# # UNCOMMENT FOR MEDIUM SCENARIO
+# # # # # # # # # # # # # # # # # # # 
+# pct <- "_m" 
+# pct_model <- "m" 
+# pct_title <- "" 
+# # pct_title <- " - Med"
+# 
+# # # # # # # # # # # # # # # # # # # 
+# # UNCOMMENT FOR HIGH SCENARIO
+# # # # # # # # # # # # # # # # # # # 
+# pct <- "_h" 
+# pct_model <- "h" 
+# pct_title <- " - High"
 
 # Define the model date 
 # NOTE: Assumes the results are downloaded and saved in YYYY-MM-DD format
@@ -74,7 +91,7 @@ date_string_nodash <- gsub("-", "", date_string)
 
 # create vars to house results
 folder_der <- "../Data_Derived/"
-folder_der_date <- paste0(folder_der, date_string, "/")
+folder_der_date <- paste0(folder_der, date_string)
 
 folder_fig <- "../Figures/"
 folder_fig <- paste0(folder_fig, date_string, "", pct_model, "/")
