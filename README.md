@@ -104,4 +104,4 @@ The following is an outline for how the data and code fit together:
 - Scripts beginning with "0" are run prior to exporting the Shock file and running the simulation in SIMPLE-G
 
 
-![Alt Text: Flow Diagram for Telecoupling & SIMPLE-G Project](../Figures/_FlowDiagram.png)
+![Alt Text: Flow Diagram for Telecoupling & SIMPLE-G Project](_FlowDiagram.png)
