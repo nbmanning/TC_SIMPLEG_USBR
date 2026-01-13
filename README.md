@@ -2,19 +2,19 @@
 
 Title: README.md
 
-Purpose: Read-Me file for the SIMPLE-G US-BR telecoupling project. Below is the set-up file structure and data provided to run this code. In the future I plan to have an initialization code that creates all of these folders automatically, but we are providing it zipped here. 
+Purpose: Read-Me file for the SIMPLE-G US-BR telecoupling project. Below is the set-up file structure and data provided to run this code. We are provide the source data, file structure, and SIMPLE-G results in a Zenodo database here. 
 
 Author: Nick Manning & Iman Haqiqi
 
 Created on: July 23,2025
 
-Last Edited: July 30, 2025 
+Last Edited: January 13, 2026 
 
 
 ## Notes
 
 - 'Main' simply indicates whatever you decide to call your main file. Here it is provided as 'TC_SIMPLEG_USBR' for a clean folder containing the bare minimum to run the SIMPLE-G + Telecoupling US/Brazil Code.
-- The Completed code (Sections 0, 1, and 2) are for the upcoming manuscript Manning et al., 2026
+- The Completed code (Sections 0, 1, 2, and 3) are for the upcoming manuscript Manning et al., 2026
 
 
 ## File Structure to Start:
@@ -29,7 +29,7 @@ If downloading locally, this is what should be manually created to make the proc
 - Main/Figures
 - Main/Results
 - Main/Results/SIMPLEG-2024-11-15
-- Main/US_Drought_Shock_v4
+- Main/US_Drought_Shock
 
 
 ## Data Needed to Start: 
@@ -61,16 +61,18 @@ _A.tif means these rasters are the sum of all technologies (irrigated & rainfed)
 
 
 ### SHOCK CALCULATION 
-The files needed to run US_Drought_Shock_v4.R, which is where we generate the .txt and .har files to use as an input to SIMPLE-G.
+The files needed to run US_Drought_Shock.R, which is where we generate the .txt and .har files to use as an input to SIMPLE-G. Files are in alphabetical order with folders at the end.
 
-- Main/US_Drought_Shock_v4/colsom_2012/colsom12.txt = the USDA-RMA Causes of Loss file which shows the amount of insured crop lost due to drought and heat in terms of indemnity payments (USD) made per county per crop.
-- Main/US_Drought_Shock_v4/Codes.csv = the column labels used to merge with colsom12.txt to re-name these columns
-- Main/US_Drought_Shock_v4/cb_2018_us_state_500k/ = Cartographic Boundaries of the states in the USA from the US Census Bureau
-- Main/US_Drought_Shock_v4/AGLAND_CROP_INSURANCE_ACRES_FIPS.csv = the USDA-NASS Census of Ag data on Insured Acres
-- Main/US_Drought_Shock_v4/AGLAND_CROPLAND_ACRES.csv = the USDA-NASS Census of Ag data on Total Cropland Acres
-- Main/US_Drought_Shock_v4/CROP_TOTALS_SALES_USD_FIPS.csv = the USDA-NASS Census of Ag data on Total Crop Sales
-- Main/US_Drought_Shock_v4/grid_id_xyg.tif = ID's for each grid-cell used in a SIMPLE-G Modeling run 
-- Main/US_Drought_Shock_v4/new_loss_rate.csv = the crop loss rates per FIPS code based on the way we are calculating loss (see Methods)
+- Main/US_Drought_Shock/AGLAND_CROP_INSURANCE_ACRES_FIPS.csv = the USDA-NASS Census of Ag data on Insured Acres
+- Main/US_Drought_Shock/AGLAND_CROPLAND_ACRES.csv = the USDA-NASS Census of Ag data on Total Cropland Acres
+- Main/US_Drought_Shock/Codes.csv = the column labels used to merge with colsom12.txt to re-name these columns
+- Main/US_Drought_Shock/Coords.csv = US FIPS codes with the x/y coordinates nad grid-cell IDs per code, along with the 2010 value and quantity of cropland per grid-cell. Since there can be multiple grid-cells within one FIPS code, this is necessary. 
+- Main/US_Drought_Shock/CROP_TOTALS_SALES_USD_FIPS.csv = the USDA-NASS Census of Ag data on Total Crop Sales
+- Main/US_Drought_Shock/grid_id_xyg.tif = ID's for each grid-cell used in a SIMPLE-G Modeling run 
+- Main/US_Drought_Shock/new_loss_rate.csv = the crop loss rates per FIPS code based on the way we are calculating loss (see Methods)
+
+- Main/US_Drought_Shock/cb_2018_us_state_500k/ = Cartographic Boundaries of the states in the USA from the US Census Bureau
+- Main/US_Drought_Shock/colsom_2012/colsom12.txt = the USDA-RMA Causes of Loss file which shows the amount of insured crop lost due to drought and heat in terms of indemnity payments (USD) made per county per crop.
 
 
 ### MAPBIOMAS DATA 
@@ -82,11 +84,14 @@ Details available from: https://brasil.mapbiomas.org/wp-content/uploads/sites/4/
 
 ### SIMPLE-G RESULTS 
 The scenario results for varying substitution elasticities (Low (l), Medium (m), and High (h)) are provided here as .txt files. These elasticities are how flexible the world is to using things other than crops that we applied the shock to. We expect with more flexibility (h) there will be less cropland expansion.
+
 - Main/Results/SIMPLEG-2024-11-15/sg1x3x10_v2411_US_Heat_l-out 
 - Main/Results/SIMPLEG-2024-11-15/sg1x3x10_v2411_US_Heat_m-out
 - Main/Results/SIMPLEG-2024-11-15/sg1x3x10_v2411_US_Heat_h-out
 
+
 The results in tabular form (unformatted) are provided as an Excel file
+
 - Main/Results/SIMPLEG-2024-11-15/regional_results.xlsx
 
 
