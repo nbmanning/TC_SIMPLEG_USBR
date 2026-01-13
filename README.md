@@ -19,17 +19,18 @@ Last Edited: January 13, 2026
 
 ## File Structure to Start:
 
-If downloading locally, this is what should be manually created to make the process run smoothly. This is also the file structure that is uploaded and available from Zenodo. 
+If downloading locally, this is what should be manually created to make the process run smoothly. 
+This is also the file structure that is uploaded and available from Zenodo. 
 
-- Main/Code
+- Main/Code/
 - Main/Data_Derived/
 - Main/Data_Source/
-- Main/Data_Source/MapBiomas
-- Main/Data_Source/SPAM2010
-- Main/Figures
-- Main/Results
-- Main/Results/SIMPLEG-2024-11-15
-- Main/US_Drought_Shock
+- Main/Data_Source/MapBiomas/
+- Main/Data_Source/SPAM2010/
+- Main/Figures/
+- Main/Results/
+- Main/Results/SIMPLEG/
+- Main/US_Drought_Shock/
 
 
 ## Data Needed to Start: 
@@ -85,14 +86,14 @@ Details available from: https://brasil.mapbiomas.org/wp-content/uploads/sites/4/
 ### SIMPLE-G RESULTS 
 The scenario results for varying substitution elasticities (Low (l), Medium (m), and High (h)) are provided here as .txt files. These elasticities are how flexible the world is to using things other than crops that we applied the shock to. We expect with more flexibility (h) there will be less cropland expansion.
 
-- Main/Results/SIMPLEG-2024-11-15/sg1x3x10_v2411_US_Heat_l-out 
-- Main/Results/SIMPLEG-2024-11-15/sg1x3x10_v2411_US_Heat_m-out
-- Main/Results/SIMPLEG-2024-11-15/sg1x3x10_v2411_US_Heat_h-out
+- Main/Results/SIMPLEG/sg1x3x10_v2411_US_Heat_l-out 
+- Main/Results/SIMPLEG/sg1x3x10_v2411_US_Heat_m-out
+- Main/Results/SIMPLEG/sg1x3x10_v2411_US_Heat_h-out
 
 
 The results in tabular form (unformatted) are provided as an Excel file
 
-- Main/Results/SIMPLEG-2024-11-15/regional_results.xlsx
+- Main/Results/SIMPLEG/regional_results.xlsx
 
 
 ## Flow Diagram
