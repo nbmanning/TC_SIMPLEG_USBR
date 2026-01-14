@@ -12,41 +12,48 @@
 
 # Edited by: Nick Manning 
 # Initial edit date: May 2023
-# Last edited: July 2025
+# Last edited: January 2026
 
 # REQUIRES:
-## SIMPLE-G Result files as '.txt' 
-## Download Results folder and add to ../Results/xx with name of date matching 2024-11-15
+## SIMPLE-G Result files as '.txt' for scenarios low (l), medium (m) and high (h)
+
+# OUTPUTS:
+## 'raster' folder with spatial results as rasters (per scenario)
+## SpatRasters with the CornSoy spatial results (per scenario)
+## Shapefiles for World, US-MW, BR, & Cerrado saved as a .RData file (doesn't change per scenario)  
+
+# # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # 
+# NOTE: Users have to change SCENARIO ID section for each different scenario
+# # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # 
+
 
 # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # 
 
-# Load Libraries & Set Constants ---- 
+# 0) Load Libraries & Set Constants ---- 
 rm(list = ls())
 
 ## Libraries ##
-library(tidyverse)
+library(tidyverse) # need several packages from here: ggplot2, dplyr, stringr
 library(raster) # use for initial raster stack and basic plotting
 library(terra) # use to wrangle geospatial data and plot
 library(geobr) # use to load BR & Cerrado extent shapefiles
 library(tigris) # use to load US and US-MW shapefiles
-library(sf)
+library(sf) # spatial shapefile manipulation 
 library(stringr) # use to manipulate result .txt file
 library(rworldmap) # getting simple BR Border
 
 ## Constants ##
 
+## SCENARIO ID #########
+
 # NOTE: change this when you change the result file to one of three TXT files
-## hi: enter "_hi" ;
-## med: enter "_m" ;
-## lo: enter "_lo" ;
-## out / default; enter ""
 
 # # # # # # # # # # # # # # # # # # 
 # UNCOMMENT FOR LOW SCENARIO
 # # # # # # # # # # # # # # # # # # 
-# pct <- "_l" 
-# pct_model <- "l" 
-# pct_title <- " - Low" 
+# pct <- "_l"
+# pct_model <- "l"
+# pct_title <- " - Low"
 
 # # # # # # # # # # # # # # # # # # 
 # UNCOMMENT FOR MEDIUM SCENARIO
@@ -65,53 +72,45 @@ library(rworldmap) # getting simple BR Border
 
 
 # Define the string to search for in file names
-search_string <- "" #"2024-11-15"
+search_string <- "" # used to be the model version
 
 # create vars to house results 
 folder_derived <- "../Data_Derived/"
-folder_fig <- "../Figures/"
-folder_results <- "../Results/"
+folder_figures <- "../Figures/"
+folder_results <- "../Results/SIMPLEG/"
 
 # List all files and folders in the current directory
-files_der <- list.dirs(folder_derived)
-files_fig <- list.dirs(folder_fig)
+files_derived <- list.dirs(folder_derived)
+files_figures <- list.dirs(folder_figures)
 
 # Check if any file name contains the search string
-
-## To-do: Create a fucntion that does this 
-
-if (!(any(grepl(search_string, files_der)))) {
+if (!(any(grepl(search_string, files_derived)))) {
   # If no file name contains the search string, create a folder with that string
   dir.create(paste0(folder_derived, search_string))
   
   cat("Derived Data Folder", search_string, "created.\n")
 } else {
-  cat("A folder with the string", search_string, "in its name already exists.\n")
+  cat("A Derived Data folder", search_string, " already exists.\n")
 }
 
 # check for figures folder
-if (!(any(grepl(search_string, files_fig)))) {
+if (!(any(grepl(search_string, files_figures)))) {
   # If no file name contains the search string, create a folder with that string
-  dir.create(paste0(folder_fig, search_string))
+  dir.create(paste0(folder_figures, search_string))
   
-  cat("Figure Folder", search_string, "created.\n")
+  cat("Figures Folder", search_string, "created.\n")
 } else {
-  cat("A folder with the string", search_string, "in its name already exists.\n")
+  cat("A Figures folder", search_string, " already exists.\n")
 }
 
-
-### For newer (3/3, 9/15, 11/15/24) runs ###
-datafile_version <- "sg1x3x10_v2411_US_Heat"
-
-folder_results <- paste0("../Results/SIMPLEG", search_string, "/")
-folder_fig <- paste0(folder_fig, search_string, "/")
-
-folder_derived <- paste0(folder_derived, search_string, "/")
-folder_results <- paste0(folder_results#, 
-                         #"stat_summary/"
-                         )
-
-datafile   <- paste0(folder_results, datafile_version, pct, "-out.txt")
+# Set Results path to SIMPLEG folders - used to be necessary for different model results  
+# folder_results <- paste0("../Results/SIMPLEG", search_string, "/")
+# folder_figures <- paste0(folder_figures, search_string, "/")
+# 
+# folder_derived <- paste0(folder_derived, search_string, "/")
+# folder_results <- paste0(folder_results#, 
+#                          #"stat_summary/"
+#                          )
 
 # check for stats folder 
 files_stat <- list.dirs(folder_results)
@@ -120,11 +119,18 @@ if (!(any(grepl("stat_summary", files_stat)))) {
   # If no file name contains the search string, create a folder with that string
   dir.create(paste0(folder_results, "stat_summary"))
   
-  cat("Figure Folder", "stat_summary", "created.\n")
+  cat("Figure Folders", "stat_summary", "created.\n")
 } else {
-  cat("A folder with the string", "stat_summary", "in its name already exists.\n")
+  cat("A Figures folder with the string", "stat_summary", "in its name already exists.\n")
 }
 
+# 0) Load SIMPLE-G Scenario Results as TXT --------
+# set model information 
+datafile_version <- "sg1x3x10_v2411_US_Heat"
+
+# Read in SIMPLE-G data file per scenario (either l, m, or h)
+# NOTE: Will only work once you've uncommented a section of SCENARIO ID
+datafile   <- paste0(folder_results, datafile_version, pct, "-out.txt")
 
 # # # # # # # # # #
 
@@ -141,7 +147,7 @@ new.lines <-
                     str_sub(old.lines, 1,1) != ""  )]
 
 # write temporary file 
-# NOTE: Will need to change to local location
+# NOTE: other users need to change to local location
 newfile = paste0(folder_results, "temp.txt")
 writeLines(new.lines, newfile, sep="\n")
 
@@ -178,6 +184,7 @@ names(dat)
 
 # 2) Create Raster Stack & Save Rasters ----------
 
+## 2.1) Create raster stack ------
 # create X and Y coordinates -- takes a bit
 dat$x <- as.numeric(round(dat$LON, digits = 1))
 dat$y <- as.numeric(round(dat$LAT, digits = 1))
@@ -190,7 +197,8 @@ gridded(dat) = T
 # create basic raster stack for saving rasters
 prct_ras = stack(dat) 
 
-# add rasters to file - uncomment and change 'ras_file' to local location
+## 2.2) Save raster stack -----
+# add rasters to file - users may need to uncomment and change 'ras_file' to local location but the function below should fix that
 ras_file <- paste0(folder_results, "raster/")
 
 # create results directory
@@ -220,7 +228,7 @@ writeRaster(prct_ras$LON, paste0(ras_file, "USBR_SIMPLEG_LON.tif"), format="GTif
 writeRaster(prct_ras$LAT, paste0(ras_file, "USBR_SIMPLEG_LAT.tif"), format="GTiff", overwrite=TRUE)
 
 
-## Save 'terra' object ------ 
+## 2.3) Save 'terra' object ------ 
 # create SpatRaster using terra
 r <- terra::rast(dat)
 
