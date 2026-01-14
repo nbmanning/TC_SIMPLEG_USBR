@@ -1,14 +1,17 @@
-# Title: 3_c_MapBiomas
-# Purpose: Bring in MapBIomas Collection 8 and plot measured land change against our scenarios
+# Title: 3c_MapBiomas.R
+# Purpose: 
+## Bring in MapBiomas Collection 8 and plot measured land change against our scenarios
 
 # Initial date: Aug 23, 2024
 # Last edited: October 2025
 
-# NOTES ------------------------------------- 
 # REQUIRES:
 ## MapBiomas Transition Collection 8 Data: "SOURCE_transonly_col8_mapbiomas_municip.csv"
-## Scenario data frame - run '3a' first
-## Simulated Cerrado land change raster - r_cerr
+## Scenario data frame 'lmh_cerrado_soyarea.Rdata' from '3a_scenario_dotplot.R'
+## Simulated Cerrado land change raster: 'r_cerr'
+
+# OUTPUTS:
+## 
 
 # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # 
 
@@ -48,33 +51,28 @@ folder_fig <- "../Figures/"
 folder_results <- "../Results/SIMPLEG/"
 
 ## Libraries -------
-library(tidyverse)
+# library(tidyverse)
+library(dplyr)
+library(ggplot2)
+library(stirngr)
 library(stringi) # removing accents
 library(geobr) # load BR shapefiles 
 library(sf) # st_intersection and crs
 library(RColorBrewer) # maps 
 library(cowplot) # plot_grid
 
-## Constants 
-
-## Shapefiles 
-
-# NOTE: Can skip to "1.3: Save/Load" after running once
 
 # 1) Load in MapBiomas Transition ------
 # Load collection 8 data in tabular form 
 csv_br_trans_m <- read.csv(paste0(folder_source, "SOURCE_transonly_col8_mapbiomas_municip.csv"), encoding = "UTF-8")
-#csv_br_trans_m <- read.csv(paste0(folder_source, "SOURCE_transonly_col10_mapbiomas_municip.csv"), encoding = "UTF-8")
-
-#names(csv_br_trans_m)
 names(csv_br_trans_m)
+
+
 ## 1.1) Tidy -----
 
 df <- csv_br_trans_m
 
-# get rid of all accents
-
-#unique(df$biome)
+# remove all accents
 df$state <- stri_trans_general(str = df$state,  id = "Latin-ASCII")
 df$biome <- stri_trans_general(str = df$biome,  id = "Latin-ASCII")
 names(df)
@@ -94,27 +92,23 @@ df <- dplyr::select(df, c("state","municipality", "geocode", "biome",
 names(df) <- str_sub(names(df), - 4, - 1)
 names(df)
 
-# rename columns - BEWARE HERE, this is manual for now, if you change the 'select' above then you need to change this as well 
+# rename columns 
+# BEWARE HERE, this is manual for now, if you change the 'select' above then you need to change this as well 
 colnames(df)[colnames(df) %in% c("tate", "lity", "code", "iome", "el_3", "el_3",  "el_4", "el_4")] <- c("state", "municipality", "geocode", "biome", 
                                                                                                         "from_level_3", "to_level_3",
                                                                                                         "from_level_4", "to_level_4")
 names(df)
-
-# save as a clean df to come back to 
-df_clean <- df
-
 
 ## 1.2) Make 'long' -----
 # gather to make into a long dataset; change the number if you changed 'select' above
 ncol(df)
 df <- gather(df,"year","ha",9:ncol(df))     
 
-
-
 ## 1.3) Save df -----
 save(df, file = paste0(folder_derived, "mapb_col8_clean_long.Rdata"))
-
 # NOTE: THIS INCLUDES ALL 
+
+
 
 # 2) Plot Transition Results -----
 
@@ -165,7 +159,6 @@ df_cerr <- df %>%
 # get aggregate sum of the entire Cerrado for stats
 agg_cerr <- df_cerr %>%
   aggregate(ha ~ year, sum) %>%
-  #mutate(year = as.Date(paste(year, 1, 1), '%Y %m %d'))
   mutate(year = as.numeric(year)) 
 
 # get agg sum of certain 'from' classes for mapping
@@ -174,15 +167,13 @@ agg_cerrmuni_fromveg <- df_cerr %>%
   aggregate(ha ~ year + geocode, sum) %>%
   mutate(year = as.numeric(year)) 
 
-#mutate(year = as.Date(paste(year, 1, 1), '%Y %m %d'))
-
 # make shape -- from veg
 shp_cerrmuni_fromveg <- shp_code_muni_in_cerr %>%
   left_join(agg_cerrmuni_fromveg,
             join_by(code_muni == geocode)) %>%
-  #mutate(year = year(year)) %>%
   filter(year >= 2012 & year <= 2017) %>% 
   mutate(years = paste0(year-1,"-",year))
+
 
 ### 2.1.3) Plot Facet Map -------
 
@@ -221,7 +212,7 @@ ggsave(filename = paste0(folder_fig, "cerr_fromveg.png"),
 
 # set calculated r_cerr as a variable (note: unit is kha)
 r_cerr <- readRDS("../Data_Derived/r_m_Cerrado.rds")
-#r_cerr <- rast(r_cerr)
+#r_cerr <- rast(r_cerr) # may need to run if below code doesn't work
 
 sg_cerr_rawch_soy <- as.numeric(global(r_cerr$rawch_SOY, fun = "sum", size = Inf, na.rm = T))
 
@@ -233,9 +224,7 @@ classes_few <- c(
 
 df_cerr_agg <- df_cerr %>%
   aggregate(ha ~ year + biome + from_level_3 + to_level_4, sum) %>%
-  #mutate(year = as.Date(paste(year, 1, 1), '%Y %m %d'))
   mutate(year = as.numeric(year)) 
-
 
 df_cerr_agg_from3 <- df_cerr_agg %>% 
   filter(from_level_3 %in% classes_few) %>% 
@@ -245,7 +234,6 @@ df_cerr_agg_from3 <- df_cerr_agg %>%
 agg_cerr_fromveg <- df_cerr %>%
   filter(from_level_3 %in% list_from_lv3) %>%
   aggregate(ha ~ year, sum) %>%
-  #mutate(year = as.Date(paste(year, 1, 1), '%Y %m %d')) %>%
   mutate(
     biome = "Cerrado",
     from_level_3 = "Sum of RVCs",
@@ -260,9 +248,7 @@ df_cerr_RVC <- rbind(df_cerr_agg_from3, agg_cerr_fromveg)
 # add year transitions
 df_cerr_RVC <- df_cerr_RVC %>% mutate(years = paste0(year-1,"-",year))
 
-# Plot -- Add horizontal line here at the SIMPLE-G Results
-# plot line plot in Mha
-
+# Plot line plot in Mha
 existing_colors <- scales::hue_pal()(length(unique(df_cerr_RVC$from_level_3)))
 
 ggplot(df_cerr_RVC, aes(x=years, group = from_level_3, y=ha/1000000, color = from_level_3)) +
@@ -270,7 +256,6 @@ ggplot(df_cerr_RVC, aes(x=years, group = from_level_3, y=ha/1000000, color = fro
   geom_point(fill = "white", size = 1.2) +
   xlab("") +
   labs(
-    #title = "From X to Soybean", # remove title to plot with transition map
     y = "Land Conversion from Previous Year (Mha)",
     color = "From-To Conversions"
   )+
@@ -335,7 +320,7 @@ scen_h <- df_cerr_soyarea_lmh %>% filter(modeltype == "h") %>% pull(chg)
 # Set upper and lower bounds based on the scenarios
 
 y_main <- scen_m
-y_upper <- scen_l # just because it's larger
+y_upper <- scen_l # just because it's typically a larger value
 y_lower <- scen_h
 
 x_int <- "2012-2013"
