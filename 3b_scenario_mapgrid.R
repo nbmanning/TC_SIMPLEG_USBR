@@ -218,7 +218,7 @@ combined_all <- (p_facet_us / p_facet_br / p_facet_cerr) +
   plot_layout(guides = "keep", heights = c(1, 1, 1)) &
   theme(legend.position = "right")
 
-combined_all
+# combined_all
 
 # save
 ggsave(combined_all, filename = paste0(folder_fig, "_facet_scenario.png"), width = 20, height = 20, dpi = 300)
