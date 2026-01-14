@@ -1,12 +1,12 @@
 # 00) Script Information ------------------------
 
-# title: 0_dataprep_BR_SIMPLEG.R
-# author: Nick Manning
-# purpose: 
+# Title: 0_dataprep_BR_SIMPLEG.R
+# Author: Nick Manning
+# Purpose: 
 ## Import and clean data needed to modify SIMPLE-G (2010 BR agriculture stats and MAPSPAM rasters).
 
-# creation date: 7/27/23
-# last updated:  January 2026
+# Creation Date: 7/27/23
+# Last Updated:  January 2026
 
 # Relevant Links: 
 # SPAM2010: https://dataverse.harvard.edu/dataset.xhtml?persistentId=doi:10.7910/DVN/PRFF8V
@@ -34,7 +34,8 @@ library(sidrar) # getting data from SIDRA
 library(RColorBrewer) # adding color palettes to maps 
 library(dplyr) # pipes
 
-# data import & export  
+# data import & export
+# NOTE: We pull the SPAM data from a folder within 'Data_Source' called 'SPAM2010'
 path_import <- "../Data_Source/"
 
 # 1) 2010 BR stats from SIDRA data ------
@@ -130,7 +131,7 @@ shp_br <- read_country(year = 2010,
 # get extent as terra object for plotting
 ext_br <- vect(ext(shp_br))
 
-# plot basic BR results by cropping and masking to just BR extent
+# get basic BR results by cropping and masking to just BR extent
 r_br <- terra::crop(spam, ext_br, mask = T) 
 r_br <- mask(r_br, shp_br)
 
@@ -149,7 +150,7 @@ spam_maize_parea_perc <- (r_br$spam2010V2r0_global_A_MAIZ_A/r_br_area) #* 100
 
 
 ### 2.2.1B) Area (% of total) -----
-# get the sum of the total crop (either so or maize) produced across BR; should be one value 
+# get the sum of the total crop (either soybean or maize) produced across BR; should be one value 
 sum_parea_soy <- as.numeric(
   global(classify(r_br$spam2010V2r0_global_A_SOYB_A, cbind(NA, 0)), fun = "sum"))
 
@@ -233,7 +234,7 @@ ext_cerr <- vect(ext(shp_br_cerr))
 r_cerr <- terra::crop(spam_perc_all, ext_cerr, mask = T)
 r_cerr <- mask(r_cerr, shp_br_cerr)
 
-# plot specific w lines
+# plot specific raster with the outline of the Cerrado
 plot(r_cerr[["soy_yield_gridcell"]], col = brewer.pal(9, "Greens"),
      main = "2010 Cerrado Soy Yield per Grid Cell")
 lines(shp_br_cerr, lwd = 0.8, lty = 3, col = "darkgray")
@@ -250,4 +251,3 @@ writeRaster(spam_perc_all, paste0(path_import, "spam2010_soyb_maize_parea_prod_y
             overwrite = T)
 writeRaster(r_cerr, paste0(path_import, "spam2010_soyb_maize_parea_prod_yield_cerr.tif"),
             overwrite = T)
-
