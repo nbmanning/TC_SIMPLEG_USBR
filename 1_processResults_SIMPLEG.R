@@ -58,9 +58,9 @@ library(rworldmap) # getting simple BR Border
 # # # # # # # # # # # # # # # # # # 
 # UNCOMMENT FOR MEDIUM SCENARIO
 # # # # # # # # # # # # # # # # # # 
-# pct <- "_m" 
-# pct_model <- "m" 
-# pct_title <- "" 
+# pct <- "_m"
+# pct_model <- "m"
+# pct_title <- ""
 # # pct_title <- " - Med"
 
 # # # # # # # # # # # # # # # # # # 
@@ -102,15 +102,6 @@ if (!(any(grepl(search_string, files_figures)))) {
 } else {
   cat("A Figures folder", search_string, " already exists.\n")
 }
-
-# Set Results path to SIMPLEG folders - used to be necessary for different model results  
-# folder_results <- paste0("../Results/SIMPLEG", search_string, "/")
-# folder_figures <- paste0(folder_figures, search_string, "/")
-# 
-# folder_derived <- paste0(folder_derived, search_string, "/")
-# folder_results <- paste0(folder_results#, 
-#                          #"stat_summary/"
-#                          )
 
 # check for stats folder 
 files_stat <- list.dirs(folder_results)
