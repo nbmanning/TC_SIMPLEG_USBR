@@ -68,9 +68,9 @@ datafile_version <- "sg1x3x10_v2411_US_Heat"
 # # # # # # # # # # # # # # # # # # # 
 # # UNCOMMENT FOR LOW SCENARIO
 # # # # # # # # # # # # # # # # # # # 
-pct <- "_l"
-pct_model <- "l"
-pct_title <- " - Low"
+# pct <- "_l"
+# pct_model <- "l"
+# pct_title <- " - Low"
 
 
 # # # # # # # # # # # # # # # # # # # 
