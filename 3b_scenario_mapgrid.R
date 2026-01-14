@@ -1,10 +1,21 @@
-# name: 3b_scenario_mapgrid.R
+# 00) Script Information ------------------------
 
-# purpose: create plot of us, cerrado, brazil l,m,h scenarios
+# Name: 3b_scenario_mapgrid.R
 
-# author: Nick Manning
+# Purpose: 
+# Creates faceted plot of land change across US, Cerrado, Brazil l,m,h scenarios
 
-# date created: October 2025
+# Author: Nick Manning
+
+# Date Created: October 2025
+# Last Edited: January 2026 
+
+# REQUIRES
+## shapefiles of regions from '1_processResults_SIMPLEG.R'
+## SpatRasters of SIMPLE-G results cropped to regions of interest (per scenario) from '2_processResults_Regional_PGC.R' 
+
+# OUTPUTS
+## '_facet_scenario.png' for Supplementary Figures section of MS
 
 # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # 
 
@@ -13,7 +24,8 @@ rm(list=ls())
 # 0) Load Libraries -----
 library(ggplot2)
 library(terra)
-library(tidyverse)
+library(dplyr)
+library(stringr)
 library(gridExtra)
 library(tidyterra)
 
@@ -145,7 +157,6 @@ p_facet_br <- ggplot(df_all_br) +
   theme_minimal() +
   labs(
     fill = "Area (kha)",
-    #title = "Change in Brazil Soybean Cropland Area by Scenario",
     title = "",
     x = "",
     y = ""
@@ -154,7 +165,6 @@ p_facet_br <- ggplot(df_all_br) +
     plot.title = element_text(hjust = 0.5, size = 30),
     legend.title = element_text(size = 20),
     legend.text = element_text(size = 14),
-    #strip.text = element_text(size = 18),
     strip.text = element_blank(),
     axis.text = element_blank()
   )
@@ -182,13 +192,11 @@ p_facet_cerr <- ggplot(df_all_cerr) +
   ) +
   facet_wrap(~ scenario) +
   geom_sf(data = vect(shp_cerr), color = "gray30", fill = NA, lwd = 0.2, inherit.aes = FALSE) +
-  #geom_sf(data = shp_cerr_states, color = "gray50", fill = "transparent", lwd = 0.2) + 
   coord_sf(crs = "EPSG:4326") +
   #coord_sf(crs = "EPSG:5880") + # cerrado polyconic 
   theme_minimal() +
   labs(
     fill = "Area (kha)",
-    #title = "Change in Cerrado Soybean Cropland Area by Scenario",
     title = "",
     x = "",
     y = ""
@@ -197,7 +205,6 @@ p_facet_cerr <- ggplot(df_all_cerr) +
     plot.title = element_text(hjust = 0.5, size = 30),
     legend.title = element_text(size = 20),
     legend.text = element_text(size = 14),
-    #strip.text = element_text(size = 18),
     strip.text = element_blank(),
     axis.text = element_blank()
   )
