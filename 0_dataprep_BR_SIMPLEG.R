@@ -5,8 +5,8 @@
 # Purpose: 
 ## Import and clean data needed to modify SIMPLE-G (2010 BR agriculture stats and MAPSPAM rasters).
 
-# Creation Date: 7/27/23
-# Last Updated:  January 2026
+# Initial Creation Date: July 27, 2023
+# Last Updated:  January 14, 2026
 
 # Relevant Links: 
 # SPAM2010: https://dataverse.harvard.edu/dataset.xhtml?persistentId=doi:10.7910/DVN/PRFF8V
