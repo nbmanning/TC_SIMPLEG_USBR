@@ -1,20 +1,29 @@
-# Title: processResults_SIMPLEG_2_maizesoy_MS.R
-# Purpose: Read and plot SIMPLE-G results from text format across US, World, BR, and Cerrado
+# 00) Script Information --------------------------
+
+# Title: 2_processResults_Regional_PGC.R
+
+# Purpose: 
+## Read and plot SIMPLE-G results across regions of interest per scenario
+### Section 1: Get Import/Export Figures from the regional tabular results
+### Section 2 & 3: Load & Clean Spatial Data
+### Section 4-7: Get & Plot Spatial Results per Specific Region 
+### Section 8: Get Per-Grid_cell (PGC) results 
+### Section 9: Merge Regional & Spatial Results for Final Table 
+
+# Author: Nick Manning
 
 # Initial date: Aug 23, 2024
 # Last edited: January 2026
 
-# NOTES ------------------------------------- 
+
 # REQUIRES:
-## RUN processResults_SIMPLEG_1.R to get the r_maizesoy.Rdata and shp_usbr.RData files for Section 2
-## RUN aggStats_Mapbiomas.R to get mapb_col8_clean_long.Rdata for Section 8
+## RUN '1_processResults_SIMPLEG.R' to get the r_maizesoy.Rdata and shp_usbr.RData files for Section 2
 ## 'regional_results.xlsx' from SIMPLE-G output files for Section 1
 
 # FOLDER STRUCTURE:
-## Create the following folders in your local 'Results' directory:
-### 'raster' which houses the results as rasters to pull into a GIS
-### 'summary_tables' which houses a table with the stats for each area (min, mean, median, 1st & 3rd Quartiles, max, and NA's)
-### 'stat_summary' which houses the raw values for changes in cropland area and production as an R data file to bring into another script   
+## 'raster' which houses the results as rasters to pull into a GIS
+## 'summary_tables' which houses a table with the stats for each area (min, mean, median, 1st & 3rd Quartiles, max, and NA's)
+## 'stat_summary' which houses the raw values for changes in cropland area and production as an R data file to bring into another script   
 
 # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # 
 
@@ -23,9 +32,8 @@ rm(list = ls())
 
 ## Libraries -----
 # imp-exp plots
-#library(tidyverse)
 library(rio)
-#library(cowplot)
+library(dplyr)
 library(stringr)
 library(ggplot2)
 library(stringr)
@@ -46,21 +54,16 @@ library(ggspatial) # N arrow and Scale Bar w tidyterrra
 # transition maps
 library(geobr)
 
-library(dplyr)
-
 ## Constants ------
-
-# NOTE: change this when you change the result file to one of three TXT files
-## hi: enter "_hi" ;
-## med: enter "_m" ;
-## lo: enter "_lo" ;
-## out / default; enter ""
-
 
 ### Loading & Saving ###
 
 # Set model version & parameter flexibility
 datafile_version <- "sg1x3x10_v2411_US_Heat"
+
+### SCENARIO ID ####################
+
+# NOTE: change this when you change the result file to one of three TXT files! 
 
 # # # # # # # # # # # # # # # # # # # 
 # # UNCOMMENT FOR LOW SCENARIO
@@ -123,7 +126,7 @@ if (!(any(grepl(date_string, files_results)))) {
   
   cat("Results Folder", date_string, "created.\n")
 } else {
-  cat("A results folder with the string", date_string, "in its name already exists.\n")
+  cat("A Results folder", date_string, " already exists.\n")
 }
 
 
@@ -134,7 +137,7 @@ if (!(any(grepl(date_string, files_results_impexp)))) {
   
   cat("Imp/Exp Results Folder", date_string, "created.\n")
 } else {
-  cat("An Imp/Exp results folder with the string", date_string, "in its name already exists.\n")
+  cat("An Imp/Exp Results folder", date_string, " already exists.\n")
 }
 
 
@@ -143,9 +146,9 @@ if (!(any(grepl(date_string, files_fig)))) {
   # If no file name contains the search string, create a folder with that string
   dir.create(paste0(folder_fig))
   
-  cat("Figure Folder", date_string, "created.\n")
+  cat("Figures Folder", date_string, "created.\n")
 } else {
-  cat("A figures folder with the string", date_string, "in its name already exists.\n")
+  cat("A Figures folder", date_string, " already exists.\n")
 }
 
 # check for stat summary folder -- commented out because stat_summary goes to '/Results/' folder now
@@ -165,6 +168,8 @@ if (!(any(grepl(date_string, files_fig)))) {
 ## 0.1) ImpExp Functions --------
 
 # Import and clean each Regional Result sheet from 'regional_results.xlsx'
+## @var is the name of the Excel sheet in the Workbook
+## @pct is the model elasticity scenario (l, m, h)
 F_clean_sheet <- function(var, pct){
   
   # get one sheet 
@@ -245,41 +250,45 @@ F_clean_sheet <- function(var, pct){
 }
 
 
-# Plotting Fxn
-F_ggplot_bar_vert_sep <- function(df, y_var, title_text, save_text){
-  
-  # need to do to use character evaluation
-  y_var <- rlang::sym(y_var)
-  
-  # plot
-  (p <- ggplot(df, aes(x = region_abv, y = !! y_var ))+
-      # Set color code on a True-False basis
-      geom_bar(aes(fill = !! y_var < 0), stat = "identity") + 
-      # if false, one color, if true, another
-      scale_fill_manual(guide = "none", breaks = c(TRUE, FALSE), values=c(col_neg, col_pos))+
-      coord_flip()+
-      theme_bw()+
-      labs(
-        title = title_text,
-        x = "",
-        y = ""
-      )+
-      theme(
-        plot.title = element_text(hjust = 0.5),
-        # remove y-axis text (use when merging exp and imp graphs)
-        #axis.text.y = element_blank()
-      )
-  )
-  # save
-  ggsave(paste0(folder_fig, save_text),
-         width = 6, height = 8)
-  
-  return(p)
-  
-}
+# # Plotting Fxn
+# ## @df is the 
+# ## @y_var  
+# F_ggplot_bar_vert_sep <- function(df, y_var, title_text, save_text){
+#   
+#   # need to do to use character evaluation
+#   y_var <- rlang::sym(y_var)
+#   
+#   # plot
+#   (p <- ggplot(df, aes(x = region_abv, y = !! y_var ))+
+#       # Set color code on a True-False basis
+#       geom_bar(aes(fill = !! y_var < 0), stat = "identity") + 
+#       # if false, one color, if true, another
+#       scale_fill_manual(guide = "none", breaks = c(TRUE, FALSE), values=c(col_neg, col_pos))+
+#       coord_flip()+
+#       theme_bw()+
+#       labs(
+#         title = title_text,
+#         x = "",
+#         y = ""
+#       )+
+#       theme(
+#         plot.title = element_text(hjust = 0.5),
+#         # remove y-axis text (use when merging exp and imp graphs)
+#         #axis.text.y = element_blank()
+#       )
+#   )
+#   # save
+#   ggsave(paste0(folder_fig, save_text),
+#          width = 6, height = 8)
+#   
+#   return(p)
+#   
+# }
 
 # Plotting Fxn
-
+# @df is the cleaned data frame to be plotted (likely either import or export data)
+# @title_text is the text to be displayed on the plot
+# @save_text is the path to save the plot to
 F_ggplot_bar_vert_stack <- function(df, title_text, save_text){
   
   
@@ -328,6 +337,8 @@ F_ggplot_bar_vert_stack <- function(df, title_text, save_text){
 
 # Fxn to Create and Save Violin Plots 
 ## NOTE: the SI code is similar but includes histograms and violin plots for more variables 
+## @df is the raster or SpatRaster that we are plotting
+## @area is the spatial region we are plotting, e.g. "World" or "US" or "Brazil" etc.
 F_p_violin <- function(df, area){
   
   ## subset and change names ##
@@ -373,6 +384,9 @@ F_p_violin <- function(df, area){
   return(p2)
 }
 
+# Fxn to compare Soybean to All and not include Maize in the final plot
+## @df is the raster or SpatRaster that we are plotting
+## @area is the spatial region we are plotting, e.g. "World" or "US" or "Brazil" etc.
 F_p_violin_soy <- function(df, area){
   
   ## subset and change names ##
@@ -422,6 +436,8 @@ F_p_violin_soy <- function(df, area){
 
 # Fxn to incorporate both of these into one function
 # Note that we exclude the clamping to 50,000 here as we fixed this step in our analysis
+## @shp is the raw shapefile from 0_data_prep_BR_SIMPLEG.R and loaded in Section 2; differs per region of interest
+## @area_name is the same as "area" in other functions - it is the name of the area of interest, e.g. "World" or "Brazil" or "US" etc. 
 F_aoi_prep <- function(shp, area_name){
   
   ## Clip to AOI Extent ##
@@ -448,6 +464,7 @@ F_aoi_prep <- function(shp, area_name){
 }
 
 # Fxn to calculate total % Change
+# basic function to compare two variables and calculate the percent change
 F_calc_pct_change <- function(final, raw_ch){
   
   # we don't have initial, so we calculate it here
@@ -458,7 +475,9 @@ F_calc_pct_change <- function(final, raw_ch){
   print(paste0("% Change is: ", pct_change, " %"))
 }
 
-# create function 
+# Fxn to create the PGC tables from the summary() function - this will be used in the EDA function
+## @area_name is the same as "area" in other functions - it is the name of the area of interest, e.g. "World" or "Brazil" or "US" etc. 
+## @pct is the SIMPLEG results scenario (either low, medium, or high)
 F_clean_summary_tables <- function(area_name, pct){
   
   filename <- paste0(folder_results, "summary_tables/table_", area_name, pct, "_10e6_", date_string_nodash)
@@ -541,6 +560,9 @@ F_clean_summary_tables <- function(area_name, pct){
 }
 
 # Fxn to get summary of data, call the violin fxn, and plot a basic map
+# this is the big wrapping function that includes some of the previously defined functions
+## @r_aoi is the result of 'F_aoi_prep' and is a cleaned and filtered SpatRaster of a given area
+## @area_name is the same as "area" in other functions - it is the name of the area of interest, e.g. "World" or "Brazil" or "US" etc. 
 F_EDA <- function(r_aoi, area_name){  
   # get and save a summary table
   table_area <- summary(r_aoi, size = Inf) # set size to not use a sample
@@ -1172,37 +1194,6 @@ F_ggplot_us_interval(
   save_title = "gg_us_rawch_cropprod_4326.png")
 
 
-
-# ## 5.4) US Corn+Soy Changes (regional_results.xlsx) ----
-# 
-# ### prod -----
-# ms_us_prod_pre <- data_clean$`Soy Production`$pre[data_clean$`Soy Production`$region_abv == "US"] + 
-#   data_clean$`Corn Production`$pre[data_clean$`Corn Production`$region_abv == "US"]
-# 
-# ms_us_prod_post <- data_clean$`Soy Production`$post[data_clean$`Soy Production`$region_abv == "US"] + 
-#   data_clean$`Corn Production`$post[data_clean$`Corn Production`$region_abv == "US"]
-# 
-# (ms_us_prod_pct_chg <- (ms_us_prod_post - ms_us_prod_pre) / ms_us_prod_pre)  
-# 
-# ### area -----
-# ms_us_area_pre <- data_clean$`Soy Area`$pre[data_clean$`Soy Area`$region_abv == "US"] + 
-#   data_clean$`Corn Area`$pre[data_clean$`Corn Area`$region_abv == "US"]
-# 
-# ms_us_area_post <- data_clean$`Soy Area`$post[data_clean$`Soy Area`$region_abv == "US"] + 
-#   data_clean$`Corn Area`$post[data_clean$`Corn Area`$region_abv == "US"]
-# 
-# (ms_us_area_raw_chg <- ms_us_area_post - ms_us_area_pre)  
-# 
-# ### exports -------
-# ms_us_exp_pre <- data_clean$`Soy Exp`$pre[data_clean$`Soy Exp`$region_abv == "US"] + 
-#   data_clean$`Corn Exp`$pre[data_clean$`Corn Exp`$region_abv == "US"]
-# 
-# ms_us_exp_post <- data_clean$`Soy Exp`$post[data_clean$`Soy Exp`$region_abv == "US"] + 
-#   data_clean$`Corn Exp`$post[data_clean$`Corn Exp`$region_abv == "US"]
-# 
-# ms_us_exp_pct_chg <- (ms_us_exp_post - ms_us_exp_pre) / ms_us_exp_pre  
-
-
 # 6) Brazil Results --------
 
 ## 6.1) Brazil EDA -------
@@ -1382,7 +1373,7 @@ ggsave(plot = p3, filename = paste0(folder_fig, "/", "gg_cerr_rawch_soy_cropland
        width = 12, height = 8, dpi = 300)
 
 
-## 7.3) Cerrado Prod Plot fo SI --------
+## 7.3) Cerrado Prod Plot for SI --------
 p4 <- F_ggplot_brcerr(
   df = r_cerr %>% subset("rawch_QCROP"),
   area = "Cerrado",
