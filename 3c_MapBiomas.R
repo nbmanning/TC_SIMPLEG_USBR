@@ -1,3 +1,5 @@
+# 00) Script Information ------------------------
+
 # Title: 3c_MapBiomas.R
 # Purpose: 
 ## Bring in MapBiomas Collection 8 and plot measured land change against our scenarios
@@ -11,7 +13,16 @@
 ## Simulated Cerrado land change raster: 'r_cerr'
 
 # OUTPUTS:
-## 
+## Collection 8 Cleaned Data: 'mapb_col8_clean_long.Rdata'
+
+## Figures:
+### Facet plot of Cerrado land transition maps per year interval: 'cerr_fromveg.png' 
+### Line plot of land transition values per classification category: 'cerr_to_soybean.png'
+### Line plot of the sum of all relevant vegetation categories, also including the SIMPLE-G results per scenario: 'cerr_to_soybean_RVC_scen.png' 
+### 'cerr_fromveg' and 'cerr_to_soybean_RVC_scen' combined to one figure for the MS:  '_line_updated.png' 
+
+## Tables:
+### Amount of land transition per year interval from MapBiomas (Supplemental Table): _landtrans_CerrBrazil.xlsx 
 
 # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # 
 
@@ -22,27 +33,10 @@ rm(list = ls())
 
 ### Loading & Saving ###
 
-# Define the model date 
-# NOTE: Assumes the results are downloaded and saved in YYYY-MM-DD format
-# date_string <- paste0("2024-11-15")
-# date_string_nodash <- gsub("-", "", date_string)
-# 
-# # create vars to house results
-# folder_derived <- "../Data_Derived/"
-# folder_der_date <- paste0(folder_derived, date_string, "/")
-# 
-# folder_fig <- "../Figures/"
-# #folder_fig <- paste0(folder_fig, date_string, "/", pct_model, "/")
-# 
-# #folder_results <- paste0("../Results/SIMPLEG-", date_string, "/", pct_model, "/")
-# #folder_results_impexp <- paste0("../Results/SIMPLEG-", date_string,"/", pct_model, "/imports_exports/")
-# 
-# folder_stat <- paste0(folder_results, "stat_summary/")
-
-# date_string <- "2024-03-03"
+# date_string is for other model runs
 date_string <- ""
 
-# looks like the last date for this attempt was 01-30
+# set folders here
 folder_stat <- paste0("../Results/SIMPLEG-", date_string, "/stat_summary/")
 folder_plot <- "../Figures/trans_mapbiomas/"
 folder_source <- "../Data_Source/MapBiomas/"
@@ -51,10 +45,9 @@ folder_fig <- "../Figures/"
 folder_results <- "../Results/SIMPLEG/"
 
 ## Libraries -------
-# library(tidyverse)
 library(dplyr)
 library(ggplot2)
-library(stirngr)
+library(stringr)
 library(stringi) # removing accents
 library(geobr) # load BR shapefiles 
 library(sf) # st_intersection and crs
@@ -136,7 +129,7 @@ df <- df %>%
 shp_muni <- read_municipality(code_muni="all", year=2018)
 
 # Load Other Shapefiles 
-load("../Data_Derived/shp_usbr.RData")
+load(paste0(folder_derived, "shp_usbr.RData"))
 
 # get municipalities that are at all within the Cerrado
 shp_muni_in_cerr <- st_intersection(shp_muni, shp_cerr)
@@ -211,7 +204,7 @@ ggsave(filename = paste0(folder_fig, "cerr_fromveg.png"),
 ## 2.2) Plot Line Plot of Cerrado Conversion ------
 
 # set calculated r_cerr as a variable (note: unit is kha)
-r_cerr <- readRDS("../Data_Derived/r_m_Cerrado.rds")
+r_cerr <- readRDS(paste0(folder_derived, "r_m_Cerrado.rds"))
 #r_cerr <- rast(r_cerr) # may need to run if below code doesn't work
 
 sg_cerr_rawch_soy <- as.numeric(global(r_cerr$rawch_SOY, fun = "sum", size = Inf, na.rm = T))
