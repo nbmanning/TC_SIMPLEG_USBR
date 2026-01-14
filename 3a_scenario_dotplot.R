@@ -1,12 +1,23 @@
-# name: 3_scenario_dotplot.R
+# 00) Script Information ------------------------
 
-# purpose: 
-## create dataframe with the Cerrado soybean area xpansion across all scenarios
+# Title: 3a_scenario_dotplot.R
+
+# Purpose: 
+## create dataframe with the Cerrado soybean area expansion across all scenarios
 ## create dot plot showing the % change in each of the cascading effects across the scenarios
 
-# author: Nick Manning
+# Author: Nick Manning
 
-# date created: October 2025
+# Date created: October 2025
+# Last Edited: January 2026
+
+# REQUIRES
+## _regional_aggregate_[scenario].xlsx files from running 1_ and 2_ three total times each (one for each scenario)
+## 
+
+# OUTPUTS
+## 'lmh_cerrado_soyarea.Rdata' which is the merged results for the Cerrado soybean area across scenarios
+## '_dotplot_scenario.png' which will be a supplemental figure
 
 # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # 
 
@@ -115,16 +126,19 @@ df_wide <- df_wide %>%
 # 2) Plot & Save --------
 # Plot
 ggplot(df_wide, aes(y = label)) +
-  #geom_errorbar(aes(xmax = h, xmin = l))+
-  #geom_segment(aes(x = l, xend = m, yend = label), color = "#C198E0", linetype = "dotted") +
+  # add the line segment that goes from the medium scenario to the higher value (which is the low elasticity scenario)
   geom_segment(aes(x = l, xend = m, yend = label), color = "darkorchid2", linetype = "dotted", linewidth = 1) +
+  # add the line segment that goes from the medium scenario to the lower value (which is the high elasticity scenario)
   geom_segment(aes(x = h, xend = m, yend = label), color = "chocolate2", linetype = "dashed", linewidth = 0.8) +
+  # add the point for the medium scenario
   geom_point(aes(x = m), color = "black", size = 2) +
+  
+  # set y labels 
   scale_y_discrete(limits = rev(levels(df_wide$label)))+
+  
+  # set other labels and themes
   labs(
-    #x = "Percent Change",
     x = "",
-    #y = "Region - Variable",
     y = "",
     title = "Percent Change across Low, Medium, and High Elasticity Scenarios"
   ) +
