@@ -68,10 +68,11 @@ datafile_version <- "sg1x3x10_v2411_US_Heat"
 # # # # # # # # # # # # # # # # # # # 
 # # UNCOMMENT FOR LOW SCENARIO
 # # # # # # # # # # # # # # # # # # # 
-# pct <- "_l" 
-# pct_model <- "l" 
-# pct_title <- " - Low" 
-# 
+pct <- "_l"
+pct_model <- "l"
+pct_title <- " - Low"
+
+
 # # # # # # # # # # # # # # # # # # # 
 # # UNCOMMENT FOR MEDIUM SCENARIO
 # # # # # # # # # # # # # # # # # # # 
@@ -79,13 +80,15 @@ datafile_version <- "sg1x3x10_v2411_US_Heat"
 # pct_model <- "m" 
 # pct_title <- "" 
 # # pct_title <- " - Med"
-# 
+
+
 # # # # # # # # # # # # # # # # # # # 
 # # UNCOMMENT FOR HIGH SCENARIO
 # # # # # # # # # # # # # # # # # # # 
 # pct <- "_h" 
 # pct_model <- "h" 
 # pct_title <- " - High"
+
 
 # Define the model date 
 # NOTE: Assumes the results are downloaded and saved in YYYY-MM-DD format
@@ -595,12 +598,12 @@ F_EDA <- function(r_aoi, area_name){
   F_clean_summary_tables(area_name, pct = pct)
   
   ## Change Section ##
-  print("Totals for Casc. Effect Graph and for Total Change")
+  #print("Totals for Casc. Effect Graph and for Total Change")
   
   # Print total change values then calculate % Change
-  cat("\n\nTotal Land Change (kha)\n\n")
-  print(global(r_aoi$new_QLAND, fun = "sum", na.rm = T))
-  print(global(r_aoi$rawch_QLAND, fun = "sum", na.rm = T))
+  #cat("\n\nTotal Land Change (kha)\n\n")
+  #print(global(r_aoi$new_QLAND, fun = "sum", na.rm = T))
+  #print(global(r_aoi$rawch_QLAND, fun = "sum", na.rm = T))
   
   # Calc % change by grabbing the total (sum) values and running the % change function
   F_calc_pct_change(
@@ -609,13 +612,13 @@ F_EDA <- function(r_aoi, area_name){
   )
   
   # print the total change in crop production
-  cat("\n\nTotal Production Change (1000 tons CE)\n\n")
-  print(global(r_aoi$rawch_QCROP, fun = "sum", na.rm = T))
+  #cat("\n\nTotal Production Change (1000 tons CE)\n\n")
+  #print(global(r_aoi$rawch_QCROP, fun = "sum", na.rm = T))
   
   # print the total changes in crop production for maize
-  cat("\n\n Maize Results\n\n")
-  print(global(r_aoi$new_LND_MAZ, fun = "sum", na.rm = T))
-  print(global(r_aoi$rawch_MAZ, fun = "sum", na.rm = T))
+  #cat("\n\n Maize Results\n\n")
+  #print(global(r_aoi$new_LND_MAZ, fun = "sum", na.rm = T))
+  #print(global(r_aoi$rawch_MAZ, fun = "sum", na.rm = T))
   F_calc_pct_change(
     final = (global(r_aoi$new_LND_MAZ, fun = "sum", na.rm = T))[[1]],
     raw_ch = (global(r_aoi$rawch_MAZ, fun = "sum", na.rm = T))[[1]]
@@ -623,9 +626,9 @@ F_EDA <- function(r_aoi, area_name){
   
   
   # print the total changes in crop production for soy  
-  cat("\n\n Soy Results\n\n")
-  print(global(r_aoi$new_LND_SOY, fun = "sum", na.rm = T))
-  print(global(r_aoi$rawch_SOY, fun = "sum", na.rm = T))
+  #cat("\n\n Soy Results\n\n")
+  #print(global(r_aoi$new_LND_SOY, fun = "sum", na.rm = T))
+  #print(global(r_aoi$rawch_SOY, fun = "sum", na.rm = T))
   F_calc_pct_change(
     final = (global(r_aoi$new_LND_SOY, fun = "sum", na.rm = T))[[1]],
     raw_ch = (global(r_aoi$rawch_SOY, fun = "sum", na.rm = T))[[1]]
@@ -778,39 +781,40 @@ ggsave(paste0(folder_fig, "stackedbar_impexp.png"),
        width = 12, height = 6)
 
 
-### 1.3.2 Soy -------
-# Get Exports  
-exp_soy <- F_clean_sheet(var = "Soy Exp", pct = pct_model)
-
-# rename
-names(exp_soy) <- c("region_abv", "chg")
-
-# get million metric tons 
-exp$chg_mmt <- (exp$chg)/1000
-
-# exclude us
-exp_nous <- exp %>% filter(region_abv != "US")
-#print(paste("Total Change in Exports (Mmt) (Excluding US): ", sum(exp_nous$chg_mmt)))
-
-### 1.2.2 Imports ----------
-# Get Imports  
-imp_soy <- F_clean_sheet(var = "Soy Imp", pct = pct_model)
-imp_corn <- F_clean_sheet(var = "Corn Imp", pct = pct_model)
-imp_cs <- rbind(imp_soy, imp_corn)
-
-imp <- rbind(imp_soy, imp_corn)
-
-# get sum by region
-imp <- aggregate(imp$chg, list(imp$region_abv), FUN=sum)
-
-# rename
-names(imp) <- c("region_abv", "chg")
-
-# get million metric tons 
-imp$chg_mmt <- (imp$chg)/1000
-
-# exclude us
-imp_nous <- imp %>% filter(region_abv != "US")
+# ## 1.4) Soy -------
+# ### 1.4.1) Soy Exports -----
+# # Get Exports  
+# exp_soy <- F_clean_sheet(var = "Soy Exp", pct = pct_model)
+# 
+# # rename
+# names(exp_soy) <- c("region_abv", "chg")
+# 
+# # get million metric tons 
+# exp$chg_mmt <- (exp$chg)/1000
+# 
+# # exclude us
+# exp_nous <- exp %>% filter(region_abv != "US")
+# #print(paste("Total Change in Exports (Mmt) (Excluding US): ", sum(exp_nous$chg_mmt)))
+# 
+# ### 1.4.2) Soy Imports ----------
+# # Get Imports  
+# imp_soy <- F_clean_sheet(var = "Soy Imp", pct = pct_model)
+# imp_corn <- F_clean_sheet(var = "Corn Imp", pct = pct_model)
+# imp_cs <- rbind(imp_soy, imp_corn)
+# 
+# imp <- rbind(imp_soy, imp_corn)
+# 
+# # get sum by region
+# imp <- aggregate(imp$chg, list(imp$region_abv), FUN=sum)
+# 
+# # rename
+# names(imp) <- c("region_abv", "chg")
+# 
+# # get million metric tons 
+# imp$chg_mmt <- (imp$chg)/1000
+# 
+# # exclude us
+# imp_nous <- imp %>% filter(region_abv != "US")
 
 # ## 1.4) Print Results for MS (excluding US) ------
 # # US Reductions in Corn/SoyExports 
@@ -978,7 +982,6 @@ F_ggplot_interval <- function(df, title_text, title_legend, save_title){
     geom_spatraster(data = df, maxcell = Inf, aes(fill = cats)) +
     scale_fill_whitebox_d(palette = "pi_y_g", direction = 1)+
     
-    #geom_sf(data = vect(shp_ecoregions), color = "gray60", fill = "transparent", lwd = 0.1)+
     geom_sf(data = vect(shp_countries), color = "gray30", fill = "transparent", lwd = 0.2)+
     
     theme_minimal()+ 
@@ -1064,12 +1067,12 @@ us_vect <- vect(shp_us)
 # set CRS of extent spatial vector
 crs(us_vect) <- crs(r)
 
-## 
+# remove US from world shapefile 
 r_no_us <- mask(r, us_vect, inverse = T)
 summary(r_no_us*1000000, size = Inf)
 #summary(r*1000000, size = Inf)
 
-# plot(r_no_us$rawch_QLAND)
+# call fxn to create EDA plots of the clipped data 
 F_EDA(r_aoi = r_no_us, area_name = "RoW")
 
 # 5) US Results ------------------------------------------------------------------------
@@ -1090,7 +1093,6 @@ F_ggplot_us_interval <- function(df, title_text, title_legend, save_title){
   #"purple", "viridi", "gn_yl", "pi_y_g", "bl_yl_rd", "deep"
   p <- ggplot() +
     geom_spatraster(data = df, maxcell = Inf, aes(fill = cats)) +
-    #scale_fill_wiki_d(na.value = "white")
     scale_fill_whitebox_d(palette = "pi_y_g", direction = 1, drop = F)+
     
     geom_sf(data = vect(shp_us), color = "gray30", fill = "transparent", lwd = 0.2)+
@@ -1216,7 +1218,6 @@ F_ggplot_brcerr <- function(df, area, brks, pal, legend_title, p_title, save_tit
     
     # use continuous palette
     scale_fill_whitebox_c(
-      #palette = "viridi", direction = 1,
       palette = pal,
       breaks = brks
     )+
@@ -1230,12 +1231,9 @@ F_ggplot_brcerr <- function(df, area, brks, pal, legend_title, p_title, save_tit
       # set plot size and center it 
       plot.title = element_text(size = 24, hjust = 0.5),
       # put legend in the bottom right 
-      #legend.position = c(0.15, 0.2),
       legend.position = c(0.1, 0.15),
       legend.title = element_text(size = 14),
-      legend.text = element_text(size = 10))#+
-  
-  
+      legend.text = element_text(size = 10))# + #uncomment for running options
   
   # option to plot all the states containing any Cerrado biome
   #geom_sf(data = shp_cerr_states, color = "gray70", fill = "transparent", lwd = 0.2)+
@@ -1475,6 +1473,10 @@ write.csv(stat_SG_summary_maizesoy,
 ## 8.2) Changes calculated for MS Abstract -------
 
 ### text block 1 ----
+
+# t_ = text
+# c_ or br_ = cerrado or brazil
+
 # Text:  Mean area of corn and soy land expansion per grid-cell in the Cerrado (32.2 ha) was ~1.6 times higher than in Brazil as a whole (24.2 ha).
 t_c1 <- as.numeric(terra::global(r_cerr$rawch_QLAND, fun = "mean", na.rm = T))
 t_br1 <- as.numeric(terra::global(r_br$rawch_QLAND, fun = "mean", na.rm = T))
@@ -1494,6 +1496,9 @@ paste0("Mean area of corn and soy land expansion per grid-cell in the Cerrado ("
 ### text block 2 ----
 
 ## SOY ## 
+
+# _s_ = soybean
+
 # We found, on average, that a 1 ha decrease in the amount of cropland dedicated to soybean in the US leads to a 0.20 increase in Cerrado soybean cropland. 
 t_s_c2 <- as.numeric(global(r_cerr$rawch_SOY, fun = "sum", na.rm = T))
 t_s_us2 <- as.numeric(global(r_us$rawch_SOY, fun = "sum", na.rm = T))
@@ -1528,7 +1533,8 @@ paste0("We found, on average, that a 1 ha decrease in the amount of cropland (co
        " ha increase in Brazil cropland.")
 
 ## 8.3) Merge Per-Grid-Cell Tables ------
-## Works as long as the "_pgc" file is not in the results folder 
+## NOTE: This works as long as the "_pgc" file is not in the results folder
+## i.e. users may get errors if they re-run the script 
 
 # Set the folder path for per-grid-cell (PGC) results
 pgc_path <- paste0("../Results/SIMPLEG/", pct_model, "/summary_tables")
@@ -1555,6 +1561,8 @@ pgc_output_file <- file.path(pgc_path, paste0("_pgc_allresults_no_round", pct, "
 
 # Write to new Excel file
 write.xlsx(pgc_combined_df, pgc_output_file)
+
+
 
 # 9) Create Regional Results Table for Areas of Interest ------
 
@@ -1605,8 +1613,8 @@ head(reg_df)
 # Optionally write to Excel
 # write.xlsx(reg_df, "../Results/st_agg.xlsx", overwrite = TRUE)
 
-## 9.2) Calculate CornSoy -----
 
+## 9.2) Calculate CornSoy -----
 
 # Define types to aggregate
 reg_cs_types <- c("Area", "Production", "Imp", "Exp", "index")
@@ -1620,8 +1628,6 @@ reg_df_combined <- reg_df %>%
     post = sum(post, na.rm = TRUE),
     .groups = "drop"
   )
-
-
 
 # Aggregate average for index type
 reg_priceindex <- reg_df %>%
@@ -1661,8 +1667,8 @@ reg_new <- "Cerrado"
 
 # Add multiple rows for the Cerrado, calculate them similar to the "text-block" step
 # NOTE: SIMPLE-G doesn't report source data "pre" values, so we have to back-calculate them with the formula: pre = post - chg 
-# e.g. after the shock there were 100 kha maize, it changed +20, so there must have been 80 kha before
-
+# e.g. after the shock the model results show 100 kha maize over an area, this value changed +20, so there must have been 80 kha before
+# NOTE: commented out pct_chg because we calculate it differently below
 reg_df_newreg <- bind_rows(
   reg_template %>% add_row(
     region_abv = reg_new,
