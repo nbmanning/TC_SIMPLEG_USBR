@@ -27,12 +27,12 @@
 
 ## 'shock_r99.RData' which contains raster 'r' which is the Loss Rate 
 ## 'y12d.txt' & 'y12d.har' which are the files that are input into SIMPLE-G
-## 'Figures/Figure_ShockMap2012.png' which is the map of the percent loss of corn+soy from drought and heat
+## 'Figure_ShockMap2012.png' which is the map of the percent loss of corn+soy from drought and heat
 
 
 # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # 
 
-# 0) Load libraries --------
+# 0) Load libraries & set paths --------
 rm(list = ls())
 getwd()
 
@@ -41,13 +41,17 @@ library(terra) # load Coords.csv
 library(dplyr) # df loading and editing
 
 # load for plotting
-library(tidyterra)
-library(RColorBrewer)
-library(ggplot2)
+library(tidyterra) # plot terrra spatrasters / spatvectors using tidyverse diction
+library(RColorBrewer) # expanded color options
+library(ggplot2) # plotting
+
+# set paths 
+folder_drought <- "../US_Drought_Shock/"
+folder_figures <- "../Figures/"
 
 # 1) Create a data frame with FIPS and XY coordinates and SIMPLE-G grid IDs ----
 # US coordinates and FIPS
-us.xy.file = "../US_Drought_Shock/Coords.csv" #NOTE: re-name folder to "../US_Drought_Shock" after moving this code to the "Code" folder 
+us.xy.file = paste0(folder_drought, "Coords.csv") 
 tmp = read.csv(us.xy.file, header=T, sep=",")
 
 # re-generate coordinates to ensure decimal accuracy
@@ -63,11 +67,11 @@ us.xy = tmp[c("x","y","FIPS", "VCRP_2010", "QLND_2010")]
 # 2) Create a data frame of loss by FIPS for 2012 ----
 
 # read the USDA RMA Causes of Loss
-loss.file = "../US_Drought_Shock/colsom_2012/colsom12.txt" #NOTE: needed to re-name folder here
+loss.file = paste0(folder_drought, "colsom_2012/colsom12.txt") #NOTE: needed to re-name folder here
 loss.dt = read.csv(loss.file, header =F, sep="|")
 
 #read the column labels
-loss.id = "../US_Drought_Shock/Codes.csv"
+loss.id = paste0(folder_drought, "Codes.csv")
 id = read.csv(loss.id, header =F, sep=",")
 
 names(loss.dt) = id$V1
@@ -93,14 +97,14 @@ loss.dt <- loss.dt %>%
 
 # select only indemnity and FIPS amounts
 loss.df = loss.dt[c("FIPS", "Indemnity_Amount")]
-loss.aggr = aggregate( . ~ FIPS, data =loss.df, FUN= sum, na.rm=T ) ## Q: Doesn't this technically include ALL forms of indemnity loss?
+loss.aggr = aggregate( . ~ FIPS, data =loss.df, FUN= sum, na.rm=T ) 
 summary(loss.aggr)
 
 
 # 3) Create a data frame of insured acres ----
 
 ## 3.1) read the insured acres from USDA-NASS Census of AG ----
-my.file = "../US_Drought_Shock/AGLAND_CROP_INSURANCE_ACRES_FIPS.csv" 
+my.file = paste0(folder_drought, "AGLAND_CROP_INSURANCE_ACRES_FIPS.csv") 
 my.dt = read.csv(my.file, header =T, sep=",")
 my.df <- my.dt %>% mutate_all(as.numeric)
 summary(my.df)
@@ -111,7 +115,7 @@ head(insured.acres)
 
 
 ## 3.2) read the cropland acres from USDA-NASS Census of AG ----
-my.file = "../US_Drought_Shock/AGLAND_CROPLAND_ACRES.csv"
+my.file = paste0(folder_drought, "AGLAND_CROPLAND_ACRES.csv")
 my.dt = read.csv(my.file, header =T, sep=",")
 my.df <- my.dt %>% mutate_all(as.numeric)
 summary(my.df)
@@ -121,7 +125,7 @@ names(crop.acres) = c("FIPS", "Crop.Acres")
 head(crop.acres)
 
 ## 3.3) read the crop sales from USDA-NASS Census of AG ----
-my.file = "../US_Drought_Shock/CROP_TOTALS_SALES_USD_FIPS.csv"
+my.file = paste0(folder_drought, "CROP_TOTALS_SALES_USD_FIPS.csv")
 my.dt = read.csv(my.file, header =T, sep=",")
 my.df <- my.dt %>% mutate_all(as.numeric)
 summary(my.df)
@@ -144,7 +148,7 @@ fips.df = merge(loss.aggr, insured.acres, by = "FIPS", all.x=T)
 fips.df = merge(fips.df,      crop.acres, by = "FIPS", all.x=T)
 fips.df = merge(fips.df,      crop.sales, by = "FIPS", all.x=T)
 
-head(fips.df) # Q: 
+head(fips.df)  
 
 fips.df$AvgIndemAcre = fips.df$Indemnity_Amount / fips.df$Insured.Acres
 fips.df$AvgSalesAcre = fips.df$Expected_Sale   / fips.df$Crop.Acres
@@ -175,11 +179,12 @@ r[r > 0.99] = 0.99
 # Avg. Loss Rate after cutting off at 0.99 
 print(paste("Average Loss Rate (c+s, post-truncate):", global(r$LossRate, fun = "mean", na.rm = T)))
 
-# 
+# truncate & set NA = 0 
 fips2 <- fips.df$LossRate
 fips2[fips2 > 0.99] = 0.99
 fips2[is.na(fips2)] = 0
 
+# print mean to go into manuscript
 ms_shock_mean <- mean(fips2, na.rm = T) * 100 # 0.1703 before setting NA to 0; 0.1692 after setting all NA to 0
 ms_shock_med <- median(fips2, na.rm = T) * 100
 
@@ -201,10 +206,9 @@ save(r, file = "../Data_Derived/shock_r99.RData")
 ## Reproject 
 ## change the projection
 u = terra::project(r, "+init=epsg:2163")
-#u = terra::project(r, "+init=epsg:4326")
+#u = terra::project(r, "+init=epsg:4326") 
 
-
-v = vect("../US_Drought_Shock/cb_2018_us_state_500k/cb_2018_us_state_500k.shp") #NOTE: Need to copy/paste the US shp folder to v2
+v = vect(paste0(folder_drought, "cb_2018_us_state_500k/cb_2018_us_state_500k.shp"))
 
 v = crop(v,s)
 
@@ -237,15 +241,17 @@ ggplot()+
   guides(fill = guide_legend(direction = "horizontal"))
 
 # save
-ggsave("../Figures/Figure_ShockMap2012.png",
+ggsave(paste0(folder_figures, "Figure_ShockMap2012.png"),
        height = 10, width = 15, dpi = 300)
 
 # 6) Shock for SIMPLE-G global  ----
-xygID  <- rast("../US_Drought_Shock/grid_id_xyg.tif")
+xygID  <- rast(paste0(folder_drought, "grid_id_xyg.tif"))
 plot(xygID)
 
+# set number of grid cells 
 nGrid = 1316744
 
+# resample shock raster for SIMPLE-G extent 
 x = resample(-r*100, xygID)
 x[is.na(x)] = 0
 plot(x)
@@ -254,15 +260,17 @@ y = c(xygID, x*xygID/xygID)
 plot(y)
 y
 
+# create df
 my.df = as.data.frame(y, xy=T)
 my.df = my.df[!is.na(my.df$grid_id_xyg),]
 my.df = my.df[ order(my.df$grid_id_xyg),]
 head(my.df)
 
-my.df$LossRate[my.df$LossRate < -80] = -80
+my.df$LossRate[my.df$LossRate < -80] = -80 # NOTE: loss rates >80 mess with SIMPLE-G model
 
 all.equal(my.df$grid_id_xyg, c(1:nGrid))
 
+# set up and save TXT and HAR files 
 v = "y12d"
 print(v)
 txt <- paste0(nGrid, ' real row_order header "',v,'" longname "US 2012 Drought Shock, revision d" ;')
