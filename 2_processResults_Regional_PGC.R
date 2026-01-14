@@ -76,9 +76,9 @@ datafile_version <- "sg1x3x10_v2411_US_Heat"
 # # # # # # # # # # # # # # # # # # # 
 # # UNCOMMENT FOR MEDIUM SCENARIO
 # # # # # # # # # # # # # # # # # # # 
-# pct <- "_m" 
-# pct_model <- "m" 
-# pct_title <- "" 
+# pct <- "_m"
+# pct_model <- "m"
+# pct_title <- ""
 # # pct_title <- " - Med"
 
 
@@ -90,8 +90,7 @@ datafile_version <- "sg1x3x10_v2411_US_Heat"
 # pct_title <- " - High"
 
 
-# Define the model date 
-# NOTE: Assumes the results are downloaded and saved in YYYY-MM-DD format
+# Define the model date - only applicable with different SIMPLEG runs
 date_string <- paste0("")
 date_string_nodash <- gsub("-", "", date_string)
 
@@ -121,8 +120,7 @@ files_results_impexp <- list.dirs(folder_results_impexp)
 
 files_fig <- list.dirs(folder_fig)
 
-# Check if a folder exists for this set of results (e.g. if date_string == '2024-03-03') 
-
+# Check if a folder exists for this set of results (e.g. if date_string == '2026-01-01') 
 if (!(any(grepl(date_string, files_results)))) {
   # If no file name contains the search string, create a folder with that string
   dir.create(paste0(folder_results))
@@ -154,15 +152,6 @@ if (!(any(grepl(date_string, files_fig)))) {
   cat("A Figures folder", date_string, " already exists.\n")
 }
 
-# check for stat summary folder -- commented out because stat_summary goes to '/Results/' folder now
-# if (!(any(grepl(date_string, files_stat)))) {
-#   # If no file name contains the search string, create a folder with that string
-#   dir.create(paste0(folder_fig))
-#   
-#   cat("Figure Folder", date_string, "created.\n")
-# } else {
-#   cat("A figures folder with the string", date_string, "in its name already exists.\n")
-# }
 
 # 0) Functions ------------------------------------------------------------------------
 
@@ -252,41 +241,6 @@ F_clean_sheet <- function(var, pct){
   return(data)
 }
 
-
-# # Plotting Fxn
-# ## @df is the 
-# ## @y_var  
-# F_ggplot_bar_vert_sep <- function(df, y_var, title_text, save_text){
-#   
-#   # need to do to use character evaluation
-#   y_var <- rlang::sym(y_var)
-#   
-#   # plot
-#   (p <- ggplot(df, aes(x = region_abv, y = !! y_var ))+
-#       # Set color code on a True-False basis
-#       geom_bar(aes(fill = !! y_var < 0), stat = "identity") + 
-#       # if false, one color, if true, another
-#       scale_fill_manual(guide = "none", breaks = c(TRUE, FALSE), values=c(col_neg, col_pos))+
-#       coord_flip()+
-#       theme_bw()+
-#       labs(
-#         title = title_text,
-#         x = "",
-#         y = ""
-#       )+
-#       theme(
-#         plot.title = element_text(hjust = 0.5),
-#         # remove y-axis text (use when merging exp and imp graphs)
-#         #axis.text.y = element_blank()
-#       )
-#   )
-#   # save
-#   ggsave(paste0(folder_fig, save_text),
-#          width = 6, height = 8)
-#   
-#   return(p)
-#   
-# }
 
 # Plotting Fxn
 # @df is the cleaned data frame to be plotted (likely either import or export data)
@@ -475,7 +429,7 @@ F_calc_pct_change <- function(final, raw_ch){
   
   # then we calculate percent change (results are in %)
   pct_change = ((final - initial)/initial)*100
-  print(paste0("% Change is: ", pct_change, " %"))
+  #print(paste0("% Change is: ", pct_change, " %"))
 }
 
 # Fxn to create the PGC tables from the summary() function - this will be used in the EDA function
@@ -598,37 +552,20 @@ F_EDA <- function(r_aoi, area_name){
   F_clean_summary_tables(area_name, pct = pct)
   
   ## Change Section ##
-  #print("Totals for Casc. Effect Graph and for Total Change")
-  
-  # Print total change values then calculate % Change
-  #cat("\n\nTotal Land Change (kha)\n\n")
-  #print(global(r_aoi$new_QLAND, fun = "sum", na.rm = T))
-  #print(global(r_aoi$rawch_QLAND, fun = "sum", na.rm = T))
-  
-  # Calc % change by grabbing the total (sum) values and running the % change function
+  # Calculate % change by grabbing the total (sum) values and running the % change function
   F_calc_pct_change(
     final = (global(r_aoi$new_QLAND, fun = "sum", na.rm = T))[[1]],
     raw_ch = (global(r_aoi$rawch_QLAND, fun = "sum", na.rm = T))[[1]]
   )
   
-  # print the total change in crop production
-  #cat("\n\nTotal Production Change (1000 tons CE)\n\n")
-  #print(global(r_aoi$rawch_QCROP, fun = "sum", na.rm = T))
-  
-  # print the total changes in crop production for maize
-  #cat("\n\n Maize Results\n\n")
-  #print(global(r_aoi$new_LND_MAZ, fun = "sum", na.rm = T))
-  #print(global(r_aoi$rawch_MAZ, fun = "sum", na.rm = T))
+  # Calculate & print the total changes in crop production for maize
   F_calc_pct_change(
     final = (global(r_aoi$new_LND_MAZ, fun = "sum", na.rm = T))[[1]],
     raw_ch = (global(r_aoi$rawch_MAZ, fun = "sum", na.rm = T))[[1]]
   )
   
   
-  # print the total changes in crop production for soy  
-  #cat("\n\n Soy Results\n\n")
-  #print(global(r_aoi$new_LND_SOY, fun = "sum", na.rm = T))
-  #print(global(r_aoi$rawch_SOY, fun = "sum", na.rm = T))
+  # Calculate & print the total changes in crop production for soy  
   F_calc_pct_change(
     final = (global(r_aoi$new_LND_SOY, fun = "sum", na.rm = T))[[1]],
     raw_ch = (global(r_aoi$rawch_SOY, fun = "sum", na.rm = T))[[1]]
@@ -637,11 +574,6 @@ F_EDA <- function(r_aoi, area_name){
   # Call EDA fxn to get and save violin plots 
   F_p_violin(r_aoi, area_name)
   F_p_violin_soy(r_aoi, area_name)
-  # Plot basic initial maps - removed as this takes a lot of time 
-  # terra::plot(r_aoi, 
-  #             axes = F#, 
-  #             #type = "interval"
-  # )
 }
 
 # 1) Import / Export Plot ------------------------------------------------------------------------
@@ -703,55 +635,7 @@ imp$chg_mmt <- (imp$chg)/1000
 # exclude us
 imp_nous <- imp %>% filter(region_abv != "US")
 
-## 1.3) Vertical Barplots ------
-
-# Run fxn to plot vertical barplot
-
-## helpful link: https://stackoverflow.com/questions/48463210/how-to-color-code-the-positive-and-negative-bars-in-barplot-using-ggplot
-
-# col_neg <- "red"
-# col_pos <- "blue"
-# 
-# ### 1.3.1: Corn-Soy ----------
-# # get Corn-Soy Exports
-# (p_exp <- F_ggplot_bar_vert_sep(
-#   df = exp_nous,
-#   y_var = "chg_mmt",
-#   title_text = "Change in Corn-Soy Exports (million metric ton)",
-#   save_text = "bar_exp_fxn.png"
-# ))
-# 
-# (p_exp <- F_ggplot_bar_vert_sep(
-#   df = exp_soy %>% filter(region_abv != "US"),
-#   y_var = "chg_mmt",
-#   title_text = "Change in Soy Exports (million metric ton)",
-#   save_text = "_t_bar_exp_soy.png"
-# ))
-# 
-# (p_exp <- F_ggplot_bar_vert_sep(
-#   df = exp_corn %>% filter(region_abv != "US"),
-#   y_var = "chg_mmt",
-#   title_text = "Change in Corn Exports (million metric ton)",
-#   save_text = "_t_bar_exp_corn.png"
-# ))
-# 
-# # get Corn-Soy Imports
-# (p_imp <- F_ggplot_bar_vert_sep(
-#   df = imp_nous,
-#   y_var = "chg_mmt",
-#   title_text = "Change in Corn-Soy Imports (million metric ton)",
-#   save_text = "bar_imp_fxn.png"
-# ))
-# 
-# # plot with the individual plots next to one another
-# # labels give "A" and "B"
-# (p <- plot_grid(p_imp, p_exp, labels = "auto"))
-# 
-# # save 
-# ggsave(paste0(folder_fig, "bar_impexp.png"),
-#        p,
-#        width = 12, height = 6)
-
+## 1.3) Plot Stacked Imp/Exp Plots -------
 # Create Stacked Plot
 (p_exp_stack <- F_ggplot_bar_vert_stack(
   df = exp_cs %>% filter(region_abv!="US"),
@@ -781,73 +665,7 @@ ggsave(paste0(folder_fig, "stackedbar_impexp.png"),
        width = 12, height = 6)
 
 
-# ## 1.4) Soy -------
-# ### 1.4.1) Soy Exports -----
-# # Get Exports  
-# exp_soy <- F_clean_sheet(var = "Soy Exp", pct = pct_model)
-# 
-# # rename
-# names(exp_soy) <- c("region_abv", "chg")
-# 
-# # get million metric tons 
-# exp$chg_mmt <- (exp$chg)/1000
-# 
-# # exclude us
-# exp_nous <- exp %>% filter(region_abv != "US")
-# #print(paste("Total Change in Exports (Mmt) (Excluding US): ", sum(exp_nous$chg_mmt)))
-# 
-# ### 1.4.2) Soy Imports ----------
-# # Get Imports  
-# imp_soy <- F_clean_sheet(var = "Soy Imp", pct = pct_model)
-# imp_corn <- F_clean_sheet(var = "Corn Imp", pct = pct_model)
-# imp_cs <- rbind(imp_soy, imp_corn)
-# 
-# imp <- rbind(imp_soy, imp_corn)
-# 
-# # get sum by region
-# imp <- aggregate(imp$chg, list(imp$region_abv), FUN=sum)
-# 
-# # rename
-# names(imp) <- c("region_abv", "chg")
-# 
-# # get million metric tons 
-# imp$chg_mmt <- (imp$chg)/1000
-# 
-# # exclude us
-# imp_nous <- imp %>% filter(region_abv != "US")
-
-# ## 1.4) Print Results for MS (excluding US) ------
-# # US Reductions in Corn/SoyExports 
-# print(paste("Total Change in US Soy Exports (Mmt) (Excluding US): ", exp_soy$chg_mmt[exp_soy$region_abv == "US"]))
-# print(paste("Total Change in US Corn Exports (Mmt) (Excluding US): ", exp_corn$chg_mmt[exp_corn$region_abv == "US"]))
-# exp_soy$chg_mmt[exp_soy$region_abv == "US"] + exp_corn$chg_mmt[exp_corn$region_abv == "US"]
-# 
-# 
-# # Total Exp
-# print(paste("Total Change in Exports (Mmt) (Excluding US): ", sum(exp_nous$chg_mmt)))
-# # Soy/Corn Exp
-# print(paste("Total Change in Soy Exports (Excluding US): ", 
-#             sum(exp_soy[!(exp_soy$region_abv %in% "US"),]$chg_mmt)))
-# print(paste("Total Change in Corn Exports (Excluding US): ", 
-#             sum(exp_corn[!(exp_corn$region_abv %in% "US"),]$chg_mmt)))
-# 
-# 
-# # Total Imp
-# print(paste("Total Change in Imports (Mmt) (Excluding US): ", sum(imp_nous$chg_mmt)))
-# # Soy/Corn Imp
-# print(paste("Total Change in Soy Imports (Excluding US): ", 
-#             sum(imp_soy[!(imp_soy$region_abv %in% "US"),]$chg_mmt)))
-# print(paste("Total Change in Corn Imports (Excluding US): ", 
-#             sum(imp_corn[!(imp_corn$region_abv %in% "US"),]$chg_mmt)))
-# 
-# # US Reductions in Corn/SoyExports 
-# print(paste("Total Change in US Soy Imports (Mmt) (US Only): ", imp_soy$chg_mmt[imp_soy$region_abv == "US"]))
-# print(paste("Total Change in US Corn Imports (Mmt) (US Only): ", imp_corn$chg_mmt[imp_corn$region_abv == "US"]))
-# 
-# imp_soy$chg_mmt[imp_soy$region_abv == "US"] + imp_corn$chg_mmt[imp_corn$region_abv == "US"]
-# 
-
-## 1.5) Create Clean Results Sheet for Casc Effects Plot ----
+## 1.4) Create Clean Results Sheet for Casc Effects Plot ----
 
 # Function for summarizing data - sums for .. and mean for ..
 F_calc_totals <- function(data){
@@ -893,10 +711,6 @@ rio::export(
   data_clean, 
   file = paste0(folder_results, 'regional_results_clean_', pct_model, '.xlsx'))
 
-
-### 1.5.1 Global Price Changes ----
-# paste("Global Soy Price Change: ", mean(data_clean$`Soy Exp Price index`$pct_chg))
-# paste("Global Corn Price Change: ", mean(data_clean$`Corn Exp Price index`$pct_chg))
 
 
 # 2) Load Shapefiles & SIMPLE-G Raster ------------------------------------------------------------------------
