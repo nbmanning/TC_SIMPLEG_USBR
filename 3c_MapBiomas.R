@@ -24,7 +24,7 @@
 ## Tables:
 ### Amount of land transition per year interval from MapBiomas (Supplemental Table): _landtrans_CerrBrazil.xlsx 
 
-# # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # 
+# # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # #  
 
 # 0) Load Libraries & Set Constants ------------------------------------------------------------------------
 rm(list = ls())
