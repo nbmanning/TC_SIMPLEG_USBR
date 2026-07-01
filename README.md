@@ -2,7 +2,7 @@
 
 Title: README.md
 
-Purpose: Read-Me file for the SIMPLE-G US-BR telecoupling project. Below is the set-up file structure and data provided to run this code. We provide the source data, file structure, and SIMPLE-G results in a Zenodo database [here](https://doi.org/10.5281/zenodo.18270880). 
+Purpose: Read-Me file for the SIMPLE-G US-BR telecoupling project. Below is the set-up file structure and data provided to run this code. We provide the source data, file structure, and SIMPLE-G results in a Zenodo database [here](https://doi.org/10.5281/zenodo.18270879). 
 
 Author: Nick Manning & Iman Haqiqi
 
