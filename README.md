@@ -8,7 +8,7 @@ Author: Nick Manning & Iman Haqiqi
 
 Created on: July 23,2025
 
-Last Edited: January 13, 2026 
+Last Edited: July 1, 2026 
 
 
 ## Notes
@@ -47,9 +47,12 @@ v = variable
 t = technology
 fff = format
 
-_A_ means Physical Area, i.e. actual area of cropland plowed and where the crop is grown (in hectares)
-_H_ means Harvested Area, i.e. at least as large as A but sometimes larger if the cropland is harvested more than once a year (in hectares)
-_P_ means total production, i.e. how much crop is grown (in metric tons (1000 kg))
+
+'_A_' means Physical Area, i.e. actual area of cropland plowed and where the crop is grown (in hectares)
+
+'_H_' means Harvested Area, i.e. at least as large as A but sometimes larger if the cropland is harvested more than once a year (in hectares)
+
+'_P_' means total production, i.e. how much crop is grown (in metric tons (1000 kg))
 
 _A.tif means these rasters are the sum of all technologies (irrigated & rainfed) 
 
