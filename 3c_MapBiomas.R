@@ -50,9 +50,11 @@ library(ggplot2)
 library(stringr)
 library(stringi) # removing accents
 library(geobr) # load BR shapefiles 
-library(sf) # st_intersection and crs
+library(sf) # st_intersection() and crs() functions
 library(RColorBrewer) # maps 
-library(cowplot) # plot_grid
+library(cowplot) # plot_grid() function
+library(terra) # managing r_cerr SpatRaster
+library(tidyr) # pivot_longer() function
 
 
 # 1) Load in MapBiomas Transition ------
@@ -93,9 +95,17 @@ colnames(df)[colnames(df) %in% c("tate", "lity", "code", "iome", "el_3", "el_3",
 names(df)
 
 ## 1.2) Make 'long' -----
-# gather to make into a long dataset; change the number if you changed 'select' above
+# gather to make into a long dataset using pivot_longer (since gather() has been replace)
+# NOTE: change the number if you changed 'select' above
 ncol(df)
-df <- gather(df,"year","ha",9:ncol(df))     
+
+df <- pivot_longer(
+  df,
+  cols = 9:ncol(df),
+  names_to = "year",
+  values_to = "ha"
+)
+
 
 ## 1.3) Save df -----
 save(df, file = paste0(folder_derived, "mapb_col8_clean_long.Rdata"))
@@ -347,11 +357,11 @@ p_trans_line <- ggplot(agg_cerr_fromveg %>% filter(year >= 2011 & year <= 2017),
   geom_segment(aes(x = x_start, xend = x_end, 
                    y = y_upper, yend = y_upper, 
                    color = "Low Elas. Scenario"),
-               linetype = "dashed", linewidth = 0.8) +
+               linetype = "dotdash", linewidth = 0.8) +
   geom_segment(aes(x = x_start, xend = x_end, 
                    y = y_lower, yend = y_lower, 
                    color = "High Elas. Scenario"),
-               linetype = "dashed", linewidth = 0.8) +
+               linetype = "dotted", linewidth = 0.8) +
   
   # Set theme settings
   theme_bw() +
