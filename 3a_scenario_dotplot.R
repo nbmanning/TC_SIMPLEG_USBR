@@ -74,9 +74,9 @@ df <- df_all %>%
   filter(
     variable == "Soybean Area" & region_abv == "US" |
       variable == "Soybean Production" & region_abv == "US" |
-      variable == "Soybean Exp Price index" & region_abv == "US" |
+      variable == "Soybean Exp Price Index" & region_abv == "US" |
       variable == "Soybean Exp" & region_abv == "US" |
-      variable == "Soybean Exp Price index" & region_abv == "Total" |
+      variable == "Soybean Exp Price Index" & region_abv == "Total" |
       variable == "Soybean Production" & region_abv == "Brazil" |
       variable == "Soybean Area" & region_abv == "Brazil" |
       variable == "Soybean Area" & region_abv == "Cerrado" 
@@ -106,8 +106,8 @@ df_wide <- df_wide %>%
     label == "US - Soybean Area" ~ "US Soybean Area",
     label == "US - Soybean Production" ~ "US Soybean Production",
     label == "US - Soybean Exp" ~ "US Soybean Exports",
-    label == "US - Soybean Exp Price index" ~ "US Soybean Prices",
-    label == "Total - Soybean Exp Price index" ~ "Global Soybean Prices",
+    label == "US - Soybean Exp Price Index" ~ "US Soybean Prices",
+    label == "Total - Soybean Exp Price Index" ~ "Global Soybean Prices",
     label == "Brazil - Soybean Area" ~ "Brazil Soybean Area",
     label == "Brazil - Soybean Production" ~ "Brazil Soybean Production",
     label == "Cerrado - Soybean Area" ~ "Cerrado Soybean Area",
